@@ -17,5 +17,8 @@
     (function() {})();
 ```
 2. Nastav si kompatibilne zobrazenie: Moja Dochadzka / Zobrazenie / Ulozene Zobrazenia / TamperMonkeyCompliant. Poradie stlpcov je podstatne!
+
 ![](TamperMonkeyCompliant.png)
-3. Enjoy!
+3. Enjoy:
+
+![](Result.png)
