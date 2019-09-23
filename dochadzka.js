@@ -89,7 +89,7 @@ $(document).ready(function() {
         let outputelement = $("#ctl00_phContent_ctl00_gridView_DXFooterRow").find("td:nth-child(6)");
         //let originalSaldo =  timeStringToMinutes(outputelement.text());
         let today = new Date();
-        let rows = $("#ctl00_phContent_ctl00_gridView_DXMainTable tr.dxgvDataRow_Aktion3");
+        let rows = $("#gridView_DXMainTable tr.dxgvDataRow_Aktion3");
         rows.each(function() {
             let dateText = $(this).find('td:nth-child(2)').text().split(' ')[1];
             let startText = $(this).find('td:nth-child(3)').text();
