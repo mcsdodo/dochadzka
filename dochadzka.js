@@ -34,6 +34,41 @@
     }
 })();
 
+function askNotificationPermission() {
+    function checkNotificationPromise() {
+        try {
+            Notification.requestPermission().then();
+        } catch(e) {
+            return false;
+        }
+
+        return true;
+    }
+    // function to actually ask the permissions
+    function handlePermission(permission) {
+        // Whatever the user answers, we make sure Chrome stores the information
+        if(!('permission' in Notification)) {
+            Notification.permission = permission;
+        }
+    }
+
+    // Let's check if the browser supports notifications
+    if (!"Notification" in window) {
+        console.log("This browser does not support notifications.");
+    } else {
+        if(checkNotificationPromise()) {
+            Notification.requestPermission()
+                .then((permission) => {
+                handlePermission(permission);
+            })
+        } else {
+            Notification.requestPermission(function(permission) {
+                handlePermission(permission);
+            });
+        }
+    }
+}
+
 let debug = false;
 
 $(document).ready(function() {
@@ -170,6 +205,15 @@ $(document).ready(function() {
                     let leftToWorkToday = workedMinsToday >= dayMins ? 0 : dayMins - workedMinsToday;
                     let completeDayAt = now.addMinutes(dayMins - workedMinsToday);
                     let completeDayWithSaldo = completeDayAt.addMinutes(-1*saldoSum);
+                    askNotificationPermission();
+                    if (breakNotice == "")
+                    {
+                        let leftToWorkTodayInMiliseconds = leftToWorkToday * 60 * 1000;
+                        setTimeout(function() {
+                            let notification = new Notification(`8 hours passed!`);
+                        }, leftToWorkTodayInMiliseconds);
+                    }
+
                     newElement.html(`${originalText}<br>`
                                     + `New saldo if you leave now: <b> ${toHoursMins(saldoNow, true)}</b><br>`
                                     + `8h day in <b> ${toHoursMins(leftToWorkToday)}</b> at ${completeDayAt.toHoursMins()}`
