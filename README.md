@@ -40,9 +40,9 @@ Pri ďalšej návšteve kliknite na tlačidlo **Pripojiť** pre rýchle načíta
 
 Aplikácia sa štandardne otvára v režime **prezerania**. Pre úpravu údajov:
 
-1. Kliknite na tlačidlo **Upraviť**
+1. Kliknite na zelené tlačidlo **Upraviť** (vpravo hore)
 2. Teraz môžete klikať na bunky a používať klávesové skratky
-3. Po dokončení kliknite na **Hotovo**
+3. Po dokončení kliknite na červené tlačidlo **Hotovo**
 
 Zmeny sa automaticky ukladajú do súboru.
 
@@ -64,7 +64,7 @@ Navigácia medzi dňami: **šípky hore/dole**
 
 ## Pridanie podpisu
 
-1. Kliknite na tlačidlo **Podpis**
+1. Kliknite na tlačidlo **Nahrať podpis**
 2. Vyberte obrázok s podpisom (PNG, JPG)
 3. Podpis sa uloží do JSON súboru a zobrazí sa pri tlači
 
