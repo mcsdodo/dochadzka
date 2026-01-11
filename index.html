@@ -1,0 +1,912 @@
+<!doctype html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dochádzka</title>
+  <style>
+    :root {
+      --ink: #0f172a;
+      --muted: #6b7280;
+      --accent: #1d4ed8;
+      --border: #d5d7de;
+      --surface: #f7f8fb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      color: var(--ink);
+      background: var(--surface);
+      padding: 24px;
+    }
+
+    main {
+      max-width: 1040px;
+      margin: 0 auto 48px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 16px 60px rgba(15, 23, 42, 0.08);
+    }
+
+    h1 {
+      margin: 12px 0 8px;
+      color: #0b2d78;
+      text-decoration: underline;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    p { margin: 6px 0; }
+
+    .meta-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 6px 0 2px;
+      color: var(--muted);
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    button {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--ink);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 120ms ease;
+    }
+
+    button:hover { border-color: #b5b8c4; }
+    button:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .ghost { background: #f3f6ff; border-color: #dbe4ff; }
+
+    #unsupported {
+      background: #fff4d5;
+      border: 1px solid #f0cd6f;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      display: none;
+    }
+
+    #monthNav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 12px 0 16px;
+    }
+
+    #insecure {
+      background: #fff4d5;
+      border: 1px solid #f0cd6f;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+
+    #monthLabel { font-weight: 600; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 8px;
+      font-size: 14px;
+    }
+
+    thead th {
+      text-align: left;
+      padding: 8px 6px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+    }
+
+    tbody td {
+      padding: 8px 6px;
+      border-bottom: 1px solid #eceff3;
+    }
+
+    tbody tr:last-child td { border-bottom: 1px solid var(--border); }
+
+    .hours-cell {
+      width: 90px;
+      border-radius: 6px;
+    }
+
+    .selected {
+      background: #e7f0ff;
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+    }
+
+    .meta { color: var(--muted); margin: 0 0 4px; }
+
+    .legend {
+      margin: 10px 0 4px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .signature {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+
+    .hidden { display: none; }
+
+    .weekend-row td {
+      background: #e8f1ff;
+      border-left: 3px solid #1d4ed8;
+    }
+
+    .holiday-row td {
+      background: #fff1c7;
+      border-left: 3px solid #f59e0b;
+    }
+
+    .week-end td {
+      border-bottom: 2px solid var(--ink);
+    }
+
+    @media screen and (prefers-color-scheme: dark) {
+      .weekend-row td {
+        background: rgba(37, 99, 235, 0.18);
+        border-left-color: #93c5fd;
+      }
+      .holiday-row td {
+        background: rgba(245, 158, 11, 0.22);
+        border-left-color: #fbbf24;
+      }
+    }
+
+    @media print {
+      @page { size: A4 portrait; margin: 10mm; }
+      body { background: #fff; padding: 0; color: #000; font-size: 11px; }
+      main { border: none; box-shadow: none; margin: 0; padding: 0; }
+      #topbar, #monthNav, #unsupported { display: none !important; }
+      button { display: none !important; }
+      .selected { outline: none; background: transparent; }
+      h1 { color: #000; text-decoration: underline; margin: 6px 0 4px; font-size: 16px; }
+      .meta-line { color: #000; gap: 8px; margin: 2px 0 6px; }
+      thead th, tbody td { border-color: #000; padding: 4px 3px; }
+      thead th { font-size: 11px; }
+      tbody td { font-size: 11px; }
+      table { font-size: 11px; }
+      .weekend-row td, .holiday-row td { background: transparent !important; color: #000; border-left-color: transparent; }
+      .legend { color: #000; font-size: 10px; }
+      .screen-only { display: none; }
+      .week-end td { border-bottom-color: #000; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div id="unsupported">Nepodporovaný prehliadač. Použite Chrome alebo Edge.</div>
+    <div id="insecure" class="hidden">Aplikácia potrebuje bezpečný kontext (https:// alebo http://localhost), aby fungovalo uloženie prístupu k súboru a automatické pripojenie.</div>
+
+    <div id="topbar" class="controls">
+      <button id="createBtn">Vytvoriť súbor</button>
+      <button id="openBtn">Otvoriť súbor</button>
+      <button id="reconnectBtn" class="ghost" title="Pripojiť posledný súbor">Pripojiť</button>
+      <button id="downloadBtn" class="ghost" disabled>Stiahnuť JSON</button>
+      <button id="signatureBtn" class="ghost" disabled>Podpis</button>
+      <button id="printBtn" class="primary" disabled>Tlačiť</button>
+      <span id="fileName" class="meta"></span>
+    </div>
+
+    <div id="monthNav" class="hidden">
+      <button id="prevMonth" title="Predošlý mesiac">◀</button>
+      <div id="monthLabel"></div>
+      <button id="nextMonth" title="Nasledujúci mesiac">▶</button>
+      <button id="newMonthBtn">+ Nový mesiac</button>
+    </div>
+
+    <section id="summary" class="hidden">
+      <h1>Dochádzka - evidencia pracovného času zamestnanca</h1>
+      <p class="meta-line">za mesiac: <span id="metaMonth"></span> | zamestnávateľ: <span id="metaEmployer"></span> | zamestnanec: <span id="metaEmployee"></span></p>
+    </section>
+
+    <table id="attendanceTable" class="hidden">
+      <thead>
+        <tr>
+          <th>Dátum</th>
+          <th>Príchod</th>
+          <th colspan="2">Prestávka</th>
+          <th>Odchod</th>
+          <th>Počet hodín</th>
+        </tr>
+        <tr class="meta">
+          <th></th>
+          <th></th>
+          <th>Odchod</th>
+          <th>Príchod</th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+      <tfoot>
+        <tr>
+          <td style="font-weight: 600;">SPOLU</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td id="totalValue" style="font-weight: 600;">0</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div class="legend hidden" id="legend">
+      D - dovolenka, SC - služobná cesta, PN - práceneschopnosť, O - OČR, IN - iná neprítomnosť<br />    
+      Prestávka* - prestávka na odpočinok a jedenie §91 ZP, alebo iná prestávka §170 ZP<br/><br/>
+      <span class="screen-only">Modré zvýraznenie = víkend, žlté zvýraznenie = sviatok (len na obrazovke, v tlači sa nezobrazuje)<br /></span>
+    </div>
+
+    <div class="signature hidden" id="signatureBlock">
+      <span>Podpis:</span>
+      <img id="signatureImg" alt="Podpis" />
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      const elements = {
+        unsupported: document.getElementById('unsupported'),
+        insecure: document.getElementById('insecure'),
+        createBtn: document.getElementById('createBtn'),
+        openBtn: document.getElementById('openBtn'),
+        reconnectBtn: document.getElementById('reconnectBtn'),
+        downloadBtn: document.getElementById('downloadBtn'),
+        signatureBtn: document.getElementById('signatureBtn'),
+        printBtn: document.getElementById('printBtn'),
+        monthNav: document.getElementById('monthNav'),
+        prevMonth: document.getElementById('prevMonth'),
+        nextMonth: document.getElementById('nextMonth'),
+        newMonthBtn: document.getElementById('newMonthBtn'),
+        monthLabel: document.getElementById('monthLabel'),
+        summary: document.getElementById('summary'),
+        metaMonth: document.getElementById('metaMonth'),
+        metaEmployer: document.getElementById('metaEmployer'),
+        metaEmployee: document.getElementById('metaEmployee'),
+        table: document.getElementById('attendanceTable'),
+        tableBody: document.getElementById('tableBody'),
+        totalValue: document.getElementById('totalValue'),
+        legend: document.getElementById('legend'),
+        signatureBlock: document.getElementById('signatureBlock'),
+        signatureImg: document.getElementById('signatureImg'),
+        fileName: document.getElementById('fileName'),
+      };
+
+      const state = {
+        fsSupported: 'showOpenFilePicker' in window && 'showSaveFilePicker' in window,
+        isSecure: window.isSecureContext,
+        fileHandle: null,
+        data: null,
+        selectedMonthKey: null,
+        selectedDayIndex: 0,
+        saveTimeout: null,
+        lastFileName: localStorage.getItem('lastFileName') || '',
+      };
+
+      const DB_NAME = 'dochadzka-db';
+      const DB_STORE = 'handles';
+      const HANDLE_KEY = 'last-handle';
+
+      const defaultConfig = {
+        employeeName: 'Jozef Mrkvička',
+        employerName: 'Šéf zemegule s.r.o.',
+        defaultTimes: {
+          arrival: '08:00',
+          breakStart: '11:30',
+          breakEnd: '12:00',
+          departure: '16:30',
+        },
+        signaturePng: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
+      };
+
+      function formatMonthKey(year, monthIndex) {
+        const mm = String(monthIndex + 1).padStart(2, '0');
+        return `${mm}-${year}`;
+      }
+
+      function getSortedMonthKeys(months) {
+        return Object.keys(months || {}).sort((a, b) => {
+          const [am, ay] = a.split('-').map(Number);
+          const [bm, by] = b.split('-').map(Number);
+          return ay === by ? am - bm : ay - by;
+        });
+      }
+
+      const holidayCache = new Map();
+
+      function calculateEaster(year) {
+        const a = year % 19;
+        const b = Math.floor(year / 100);
+        const c = year % 100;
+        const d = Math.floor(b / 4);
+        const e = b % 4;
+        const f = Math.floor((b + 8) / 25);
+        const g = Math.floor((b - f + 1) / 3);
+        const h = (19 * a + b - d - g + 15) % 30;
+        const i = Math.floor(c / 4);
+        const k = c % 4;
+        const l = (32 + 2 * e + 2 * i - h - k) % 7;
+        const m = Math.floor((a + 11 * h + 22 * l) / 451);
+        const month = Math.floor((h + l - 7 * m + 114) / 31) - 1;
+        const day = ((h + l - 7 * m + 114) % 31) + 1;
+        return new Date(year, month, day);
+      }
+
+      function openDb() {
+        return new Promise((resolve, reject) => {
+          const req = indexedDB.open(DB_NAME, 1);
+          req.onupgradeneeded = () => {
+            req.result.createObjectStore(DB_STORE);
+          };
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      }
+
+      async function saveHandle(handle) {
+        try {
+          const db = await openDb();
+          await new Promise((resolve, reject) => {
+            const tx = db.transaction(DB_STORE, 'readwrite');
+            tx.objectStore(DB_STORE).put(handle, HANDLE_KEY);
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+          });
+          db.close();
+        } catch (err) {
+          console.warn('Nepodarilo sa uložiť odkaz na súbor', err);
+        }
+      }
+
+      async function loadStoredHandle() {
+        try {
+          const db = await openDb();
+          const handle = await new Promise((resolve, reject) => {
+            const tx = db.transaction(DB_STORE, 'readonly');
+            const req = tx.objectStore(DB_STORE).get(HANDLE_KEY);
+            req.onsuccess = () => resolve(req.result || null);
+            req.onerror = () => reject(req.error);
+          });
+          db.close();
+          return handle;
+        } catch (err) {
+          console.warn('Nepodarilo sa načítať odkaz na súbor', err);
+          return null;
+        }
+      }
+
+      async function clearStoredHandle() {
+        try {
+          const db = await openDb();
+          await new Promise((resolve, reject) => {
+            const tx = db.transaction(DB_STORE, 'readwrite');
+            tx.objectStore(DB_STORE).delete(HANDLE_KEY);
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+          });
+          db.close();
+        } catch (err) {
+          console.warn('Nepodarilo sa vymazať odkaz na súbor', err);
+        }
+      }
+
+      function getSlovakHolidays(year) {
+        if (holidayCache.has(year)) return holidayCache.get(year);
+        const holidays = new Set([
+          '01-01', '01-06', '05-01', '05-08', '07-05', '08-29', '09-01', '11-01', '11-17', '12-24', '12-25', '12-26',
+        ]);
+        const easter = calculateEaster(year);
+        const goodFriday = new Date(easter);
+        goodFriday.setDate(easter.getDate() - 2);
+        const easterMonday = new Date(easter);
+        easterMonday.setDate(easter.getDate() + 1);
+        const mmdd = (d) => `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        holidays.add(mmdd(goodFriday));
+        holidays.add(mmdd(easterMonday));
+        holidayCache.set(year, holidays);
+        return holidays;
+      }
+
+      function parseMonthKey(key) {
+        if (!key) return null;
+        const [m, y] = key.split('-').map(Number);
+        if (!m || !y) return null;
+        return { year: y, monthIndex: m - 1 };
+      }
+
+      function isWeekendDay(monthKey, dayKey) {
+        const parsed = parseMonthKey(monthKey);
+        if (!parsed) return false;
+        const day = Number(dayKey);
+        if (!Number.isFinite(day)) return false;
+        const d = new Date(parsed.year, parsed.monthIndex, day);
+        const dow = d.getDay();
+        return dow === 0 || dow === 6;
+      }
+
+      function isHolidayDay(monthKey, dayKey) {
+        const parsed = parseMonthKey(monthKey);
+        if (!parsed) return false;
+        const set = getSlovakHolidays(parsed.year);
+        const mmdd = `${String(parsed.monthIndex + 1).padStart(2, '0')}-${String(Number(dayKey)).padStart(2, '0')}`;
+        return set.has(mmdd);
+      }
+
+      function isSunday(monthKey, dayKey) {
+        const parsed = parseMonthKey(monthKey);
+        if (!parsed) return false;
+        const day = Number(dayKey);
+        if (!Number.isFinite(day)) return false;
+        const d = new Date(parsed.year, parsed.monthIndex, day);
+        return d.getDay() === 0;
+      }
+
+      function generateMonth(year, monthIndex) {
+        const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+        const holidays = getSlovakHolidays(year);
+        const days = {};
+        for (let day = 1; day <= daysInMonth; day++) {
+          const date = new Date(year, monthIndex, day);
+          const dayKey = String(day).padStart(2, '0');
+          const mmdd = `${String(monthIndex + 1).padStart(2, '0')}-${dayKey}`;
+          const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+          if (isWeekend) {
+            days[dayKey] = '0';
+          } else if (holidays.has(mmdd)) {
+            days[dayKey] = 'S';
+          } else {
+            days[dayKey] = '8';
+          }
+        }
+        return { days };
+      }
+
+      function normalizeData(input) {
+        const cfg = { ...defaultConfig, ...(input.config || {}) };
+        cfg.defaultTimes = { ...defaultConfig.defaultTimes, ...(input.config?.defaultTimes || {}) };
+        const months = { ...(input.months || {}) };
+        return { ...input, config: cfg, months };
+      }
+
+      function createSampleData() {
+        const now = new Date();
+        const monthKey = formatMonthKey(now.getFullYear(), now.getMonth());
+        const months = {};
+        months[monthKey] = generateMonth(now.getFullYear(), now.getMonth());
+        const firstDays = Object.keys(months[monthKey].days).slice(0, 3);
+        if (firstDays[0]) months[monthKey].days[firstDays[0]] = '0';
+        if (firstDays[1]) months[monthKey].days[firstDays[1]] = 'D';
+        if (firstDays[2]) months[monthKey].days[firstDays[2]] = '8';
+        return { config: { ...defaultConfig }, months };
+      }
+
+      async function verifyPermission(fileHandle, withWrite) {
+        if (!fileHandle) return false;
+        const opts = withWrite ? { mode: 'readwrite' } : {};
+        if ((await fileHandle.queryPermission(opts)) === 'granted') return true;
+        if ((await fileHandle.requestPermission(opts)) === 'granted') return true;
+        return false;
+      }
+
+      function downloadData(filename = 'dochadzka.json') {
+        if (!state.data) return;
+        const blob = new Blob([JSON.stringify(state.data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 500);
+      }
+
+      async function loadFromHandle(handle) {
+        if (!handle) return false;
+        try {
+          if (!(await verifyPermission(handle, false))) return false;
+          const file = await handle.getFile();
+          const text = await file.text();
+          const normalized = normalizeData(JSON.parse(text));
+          state.fileHandle = handle;
+          state.data = normalized;
+          const monthKeys = getSortedMonthKeys(normalized.months);
+          state.selectedMonthKey = monthKeys[0] || null;
+          state.selectedDayIndex = 0;
+          state.lastFileName = handle.name || '';
+          localStorage.setItem('lastFileName', state.lastFileName);
+          render();
+          return true;
+        } catch (err) {
+          console.error('Nepodarilo sa načítať súbor', err);
+          return false;
+        }
+      }
+
+      async function createSampleFile() {
+        try {
+          const data = normalizeData(createSampleData());
+          state.data = data;
+          state.selectedMonthKey = getSortedMonthKeys(data.months)[0] || null;
+          state.selectedDayIndex = 0;
+
+          if (state.fsSupported) {
+            const handle = await window.showSaveFilePicker({
+              suggestedName: 'dochadzka.json',
+              types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }],
+            });
+            const writable = await handle.createWritable();
+            await writable.write(JSON.stringify(data, null, 2));
+            await writable.close();
+            state.fileHandle = handle;
+            state.lastFileName = handle.name || 'dochadzka.json';
+            saveHandle(handle);
+          } else {
+            state.fileHandle = null;
+            state.lastFileName = 'dochadzka.json';
+            downloadData('dochadzka.json');
+          }
+
+          localStorage.setItem('lastFileName', state.lastFileName);
+          render();
+        } catch (err) {
+          if (err?.name !== 'AbortError') console.error(err);
+        }
+      }
+
+      async function openFile() {
+        try {
+          if (state.fsSupported) {
+            const [handle] = await window.showOpenFilePicker({
+              types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }],
+              multiple: false,
+            });
+            if (!handle) return;
+            const loaded = await loadFromHandle(handle);
+            if (loaded) saveHandle(handle);
+            return;
+          }
+
+          const input = document.createElement('input');
+          input.type = 'file';
+          input.accept = 'application/json';
+          input.onchange = async () => {
+            const file = input.files?.[0];
+            if (!file) return;
+            try {
+              const text = await file.text();
+              const data = normalizeData(JSON.parse(text));
+              state.fileHandle = null;
+              state.data = data;
+              const monthKeys = getSortedMonthKeys(data.months);
+              state.selectedMonthKey = monthKeys[0] || null;
+              state.selectedDayIndex = 0;
+              state.lastFileName = file.name || '';
+              localStorage.setItem('lastFileName', state.lastFileName);
+              render();
+            } catch (err) {
+              console.error(err);
+              alert('Nepodarilo sa načítať JSON.');
+            }
+          };
+          input.click();
+        } catch (err) {
+          if (err?.name !== 'AbortError') {
+            console.error(err);
+            alert('Nepodarilo sa otvoriť súbor.');
+          }
+        }
+      }
+
+      async function reconnectFile() {
+        if (!state.fsSupported) {
+          alert('Pripojenie nie je dostupné. Použite "Otvoriť súbor" a vyberte JSON.');
+          return;
+        }
+        if (!state.isSecure) {
+          alert('Pre spoľahlivé automatické pripojenie použite https:// alebo http://localhost.');
+        }
+        if (state.fileHandle && (await loadFromHandle(state.fileHandle))) return;
+        const stored = await loadStoredHandle();
+        if (stored && (await loadFromHandle(stored))) return;
+        alert('Súbor sa nepodarilo pripojiť. Použite "Otvoriť súbor" a vyberte ho ručne.');
+      }
+
+      function selectMonth(newKey) {
+        if (!state.data?.months[newKey]) return;
+        state.selectedMonthKey = newKey;
+        state.selectedDayIndex = 0;
+        render();
+      }
+
+      function changeMonth(step) {
+        const keys = getSortedMonthKeys(state.data?.months || {});
+        const idx = keys.indexOf(state.selectedMonthKey);
+        const next = keys[idx + step];
+        if (next) selectMonth(next);
+      }
+
+      function getDayKeys(monthKey) {
+        const month = state.data?.months?.[monthKey];
+        if (!month) return [];
+        return Object.keys(month.days).sort();
+      }
+
+      function setSelectedDay(index) {
+        const dayKeys = getDayKeys(state.selectedMonthKey);
+        if (!dayKeys.length) return;
+        const bounded = ((index % dayKeys.length) + dayKeys.length) % dayKeys.length;
+        state.selectedDayIndex = bounded;
+        render(true);
+      }
+
+      function handleKeydown(e) {
+        if (!state.data || !state.selectedMonthKey) return;
+        const key = e.key;
+        if (key === 'ArrowUp') {
+          e.preventDefault();
+          setSelectedDay(state.selectedDayIndex - 1);
+          return;
+        }
+        if (key === 'ArrowDown') {
+          e.preventDefault();
+          setSelectedDay(state.selectedDayIndex + 1);
+          return;
+        }
+
+        const upper = key.toUpperCase();
+        const valid = ['8', '0', 'D', 'P', 'O', 'S', 'I'];
+        if (!valid.includes(upper)) return;
+        const dayKeys = getDayKeys(state.selectedMonthKey);
+        const dayKey = dayKeys[state.selectedDayIndex];
+        if (!dayKey) return;
+        const current = state.data.months[state.selectedMonthKey].days[dayKey];
+        let nextValue = current;
+        if (upper === '8') nextValue = '8';
+        else if (upper === '0') nextValue = '0';
+        else if (upper === 'D') nextValue = 'D';
+        else if (upper === 'P') nextValue = 'PN';
+        else if (upper === 'O') nextValue = 'O';
+        else if (upper === 'I') nextValue = 'IN';
+        else if (upper === 'S') nextValue = 'SC';
+        if (nextValue !== current) {
+          state.data.months[state.selectedMonthKey].days[dayKey] = nextValue;
+          scheduleSave();
+          render(true);
+        }
+      }
+
+      function getTimesForValue(value) {
+        const defaults = state.data?.config?.defaultTimes || defaultConfig.defaultTimes;
+        if (value === '8') return { arrival: defaults.arrival, breakStart: defaults.breakStart, breakEnd: defaults.breakEnd, departure: defaults.departure, hours: '8' };
+        if (value === '0') return { arrival: '-', breakStart: '-', breakEnd: '-', departure: '-', hours: '0' };
+        if (value === 'SC') return { arrival: '-', breakStart: '-', breakEnd: '-', departure: '-', hours: 'SC' };
+        return { arrival: '-', breakStart: '-', breakEnd: '-', departure: '-', hours: value };
+      }
+
+      function calculateTotal(monthKey) {
+        const dayKeys = getDayKeys(monthKey);
+        return dayKeys.reduce((sum, key) => {
+          const v = state.data.months[monthKey].days[key];
+          if (v === 'SC') return sum + 8;
+          const asNum = Number(v);
+          return sum + (Number.isFinite(asNum) ? asNum : 0);
+        }, 0);
+      }
+
+      function scheduleSave() {
+        if (!state.fileHandle) return;
+        clearTimeout(state.saveTimeout);
+        state.saveTimeout = setTimeout(saveFile, 100);
+      }
+
+      async function saveFile() {
+        if (!state.fileHandle) return;
+        try {
+          if (!(await verifyPermission(state.fileHandle, true))) return;
+          const writable = await state.fileHandle.createWritable();
+          await writable.write(JSON.stringify(state.data, null, 2));
+          await writable.close();
+        } catch (err) {
+          console.error('save error', err);
+        }
+      }
+
+      function addNewMonth() {
+        const keys = getSortedMonthKeys(state.data.months);
+        let year;
+        let monthIndex;
+        if (!keys.length) {
+          const now = new Date();
+          year = now.getFullYear();
+          monthIndex = now.getMonth();
+        } else {
+          const last = keys[keys.length - 1];
+          const [m, y] = last.split('-').map(Number);
+          year = y;
+          monthIndex = m - 1;
+          monthIndex += 1;
+          if (monthIndex > 11) { monthIndex = 0; year += 1; }
+        }
+        const newKey = formatMonthKey(year, monthIndex);
+        state.data.months[newKey] = generateMonth(year, monthIndex);
+        state.selectedMonthKey = newKey;
+        state.selectedDayIndex = 0;
+        scheduleSave();
+        render();
+      }
+
+      function uploadSignature() {
+        if (!state.data) return;
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = async () => {
+          const file = input.files?.[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = () => {
+            state.data.config.signaturePng = reader.result;
+            scheduleSave();
+            render();
+          };
+          reader.readAsDataURL(file);
+        };
+        input.click();
+      }
+
+      function render(focusAfterRender = false) {
+        elements.unsupported.style.display = state.fsSupported ? 'none' : 'block';
+        elements.insecure.classList.toggle('hidden', state.isSecure);
+        elements.reconnectBtn.textContent = state.lastFileName ? `Pripojiť: ${state.lastFileName}` : 'Pripojiť';
+        elements.reconnectBtn.disabled = !state.lastFileName;
+        elements.openBtn.disabled = false;
+        elements.createBtn.disabled = false;
+        elements.fileName.textContent = state.lastFileName ? `Súbor: ${state.lastFileName}` : '';
+
+        const hasData = Boolean(state.data && state.selectedMonthKey);
+        elements.signatureBtn.disabled = !hasData;
+        elements.downloadBtn.disabled = !hasData;
+        elements.printBtn.disabled = !hasData;
+        elements.monthNav.classList.toggle('hidden', !hasData);
+        elements.summary.classList.toggle('hidden', !hasData);
+        elements.table.classList.toggle('hidden', !hasData);
+        elements.legend.classList.toggle('hidden', !hasData);
+        elements.signatureBlock.classList.toggle('hidden', !hasData);
+
+        if (!hasData) return;
+
+        const monthKeys = getSortedMonthKeys(state.data.months);
+        if (!state.selectedMonthKey || !state.data.months[state.selectedMonthKey]) {
+          state.selectedMonthKey = monthKeys[0];
+        }
+
+        const currentIndex = monthKeys.indexOf(state.selectedMonthKey);
+        const prevLabel = monthKeys[currentIndex - 1] || '–';
+        const nextLabel = monthKeys[currentIndex + 1] || '–';
+        elements.prevMonth.textContent = `◀ ${prevLabel}`;
+        elements.nextMonth.textContent = `${nextLabel} ▶`;
+        elements.prevMonth.disabled = currentIndex <= 0;
+        elements.nextMonth.disabled = currentIndex >= monthKeys.length - 1;
+        elements.monthLabel.textContent = `[${state.selectedMonthKey}]`;
+
+        const currentMonth = state.data.months[state.selectedMonthKey];
+        const dayKeys = getDayKeys(state.selectedMonthKey);
+        if (state.selectedDayIndex >= dayKeys.length) state.selectedDayIndex = dayKeys.length - 1;
+
+        elements.metaMonth.textContent = state.selectedMonthKey;
+        elements.metaEmployer.textContent = state.data.config?.employerName || '';
+        elements.metaEmployee.textContent = state.data.config?.employeeName || '';
+
+        const rows = dayKeys.map((dayKey, idx) => {
+          const value = currentMonth.days[dayKey];
+          const times = getTimesForValue(value);
+          const selected = idx === state.selectedDayIndex;
+          const weekend = isWeekendDay(state.selectedMonthKey, dayKey);
+          const holiday = isHolidayDay(state.selectedMonthKey, dayKey);
+          const sunday = isSunday(state.selectedMonthKey, dayKey);
+          const rowClass = [weekend ? 'weekend-row' : '', holiday ? 'holiday-row' : '', sunday ? 'week-end' : ''].filter(Boolean).join(' ');
+          return `
+            <tr data-day="${dayKey}" data-index="${idx}" class="${rowClass}">
+              <td>${dayKey}</td>
+              <td>${times.arrival}</td>
+              <td>${times.breakStart}</td>
+              <td>${times.breakEnd}</td>
+              <td>${times.departure}</td>
+              <td class="hours-cell" tabindex="0" data-index="${idx}" ${selected ? 'aria-current="true"' : ''}>${times.hours}</td>
+            </tr>
+          `;
+        }).join('');
+        elements.tableBody.innerHTML = rows;
+
+        const total = calculateTotal(state.selectedMonthKey);
+        elements.totalValue.textContent = total;
+
+        if (state.data.config?.signaturePng) {
+          elements.signatureImg.src = state.data.config.signaturePng;
+        } else {
+          elements.signatureImg.removeAttribute('src');
+        }
+
+        const highlightSelection = () => {
+          elements.tableBody.querySelectorAll('.hours-cell').forEach((cell) => {
+            const idx = Number(cell.dataset.index);
+            cell.classList.toggle('selected', idx === state.selectedDayIndex);
+          });
+        };
+
+        elements.tableBody.querySelectorAll('.hours-cell').forEach((cell) => {
+          const idx = Number(cell.dataset.index);
+          cell.addEventListener('focus', () => {
+            state.selectedDayIndex = idx;
+            highlightSelection();
+          });
+          cell.addEventListener('click', () => {
+            state.selectedDayIndex = idx;
+            cell.focus();
+            highlightSelection();
+          });
+        });
+
+        highlightSelection();
+        if (focusAfterRender) {
+          const activeCell = elements.tableBody.querySelector(`.hours-cell[data-index="${state.selectedDayIndex}"]`);
+          if (activeCell) activeCell.focus({ preventScroll: false });
+        }
+      }
+
+      function init() {
+        elements.createBtn.addEventListener('click', createSampleFile);
+        elements.openBtn.addEventListener('click', openFile);
+        elements.reconnectBtn.addEventListener('click', reconnectFile);
+        elements.downloadBtn.addEventListener('click', () => downloadData(state.lastFileName || 'dochadzka.json'));
+        elements.signatureBtn.addEventListener('click', uploadSignature);
+        elements.printBtn.addEventListener('click', () => window.print());
+        elements.newMonthBtn.addEventListener('click', () => { addNewMonth(); });
+        elements.prevMonth.addEventListener('click', () => changeMonth(-1));
+        elements.nextMonth.addEventListener('click', () => changeMonth(1));
+        document.addEventListener('keydown', handleKeydown);
+
+        if (!state.fsSupported) {
+          elements.unsupported.style.display = 'block';
+        }
+        render(false);
+
+        (async () => {
+          const stored = await loadStoredHandle();
+          if (stored) {
+            const ok = await loadFromHandle(stored);
+            if (!ok) await clearStoredHandle();
+          }
+        })();
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>
