@@ -2,7 +2,7 @@
 
 Jednoduchá webová aplikácia na evidenciu pracovného času zamestnanca. Funguje kompletne v prehliadači, bez potreby servera.
 
-**Demo:** https://mcsdodo.github.io/dochadzka/
+**Aplikácia:** https://mcsdodo.github.io/dochadzka/
 
 ![Screenshot](screenshot.png)
 
