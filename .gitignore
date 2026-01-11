@@ -1,8 +1,7 @@
 # Source Excel file (reference only)
 dochadzka.xlsx
 
-# Screenshots
-*.png
+sample.png
 
 # OS files
 .DS_Store
