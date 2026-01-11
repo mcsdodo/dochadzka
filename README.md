@@ -4,6 +4,8 @@ Jednoduchá webová aplikácia na evidenciu pracovného času zamestnanca. Fungu
 
 **Demo:** https://mcsdodo.github.io/dochadzka/
 
+![Screenshot](screenshot.png)
+
 ## Ako začať
 
 ### 1. Vytvorenie nového súboru
