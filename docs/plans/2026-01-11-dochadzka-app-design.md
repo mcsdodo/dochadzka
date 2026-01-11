@@ -190,7 +190,48 @@ None - vanilla HTML/CSS/JS only.
 
 ### Deployment
 
-Single `index.html` pushed to GitHub Pages.
+**GitHub repository:**
+- Create new public repo: `dochadzka`
+- URL: `https://github.com/<username>/dochadzka`
+
+**GitHub Pages deployment via GitHub Action:**
+
+`.github/workflows/deploy.yml`:
+```yaml
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v4
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+      - id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+**Setup steps:**
+1. Create repo on GitHub (public)
+2. Enable GitHub Pages in repo settings → Source: GitHub Actions
+3. Push code with workflow file
+4. Action auto-deploys on every push to master
+
+**Final URL:** `https://<username>.github.io/dochadzka/`
 
 ## Implementation Steps
 
@@ -203,4 +244,6 @@ Single `index.html` pushed to GitHub Pages.
 7. Implement signature PNG upload
 8. Implement print styling
 9. Test full workflow
-10. Deploy to GitHub Pages
+10. Create GitHub Action workflow file
+11. Create public GitHub repo `dochadzka`
+12. Push code and verify deployment
