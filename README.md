@@ -36,9 +36,19 @@ Otvorte súbor `dochadzka.json` v textovom editore a upravte:
 
 Pri ďalšej návšteve kliknite na tlačidlo **Pripojiť** pre rýchle načítanie posledného súboru.
 
+## Úprava údajov
+
+Aplikácia sa štandardne otvára v režime **prezerania**. Pre úpravu údajov:
+
+1. Kliknite na tlačidlo **Upraviť**
+2. Teraz môžete klikať na bunky a používať klávesové skratky
+3. Po dokončení kliknite na **Hotovo**
+
+Zmeny sa automaticky ukladajú do súboru.
+
 ## Ovládanie klávesnicou
 
-Po kliknutí na bunku v stĺpci "Počet hodín":
+V režime úprav (po kliknutí na **Upraviť**):
 
 | Klávesa | Hodnota | Význam |
 |---------|---------|--------|

@@ -209,6 +209,7 @@
       <button id="openBtn">Otvoriť súbor</button>
       <button id="reconnectBtn" class="ghost" title="Pripojiť posledný súbor">Pripojiť</button>
       <button id="downloadBtn" class="ghost" disabled>Stiahnuť JSON</button>
+      <button id="editBtn" class="ghost" disabled>Upraviť</button>
       <button id="signatureBtn" class="ghost" disabled>Podpis</button>
       <button id="printBtn" class="primary" disabled>Tlačiť</button>
       <span id="fileName" class="meta"></span>
@@ -278,6 +279,7 @@
         openBtn: document.getElementById('openBtn'),
         reconnectBtn: document.getElementById('reconnectBtn'),
         downloadBtn: document.getElementById('downloadBtn'),
+        editBtn: document.getElementById('editBtn'),
         signatureBtn: document.getElementById('signatureBtn'),
         printBtn: document.getElementById('printBtn'),
         monthNav: document.getElementById('monthNav'),
@@ -307,6 +309,7 @@
         selectedDayIndex: 0,
         saveTimeout: null,
         lastFileName: localStorage.getItem('lastFileName') || '',
+        editMode: false,
       };
 
       const DB_NAME = 'dochadzka-db';
@@ -665,7 +668,7 @@
       }
 
       function handleKeydown(e) {
-        if (!state.data || !state.selectedMonthKey) return;
+        if (!state.data || !state.selectedMonthKey || !state.editMode) return;
         const key = e.key;
         if (key === 'ArrowUp') {
           e.preventDefault();
@@ -789,6 +792,10 @@
         elements.fileName.textContent = state.lastFileName ? `Súbor: ${state.lastFileName}` : '';
 
         const hasData = Boolean(state.data && state.selectedMonthKey);
+        elements.editBtn.disabled = !hasData;
+        elements.editBtn.textContent = state.editMode ? 'Hotovo' : 'Upraviť';
+        elements.editBtn.classList.toggle('primary', state.editMode);
+        elements.editBtn.classList.toggle('ghost', !state.editMode);
         elements.signatureBtn.disabled = !hasData;
         elements.downloadBtn.disabled = !hasData;
         elements.printBtn.disabled = !hasData;
@@ -837,7 +844,7 @@
               <td>${times.breakStart}</td>
               <td>${times.breakEnd}</td>
               <td>${times.departure}</td>
-              <td class="hours-cell" tabindex="0" data-index="${idx}" ${selected ? 'aria-current="true"' : ''}>${times.hours}</td>
+              <td class="hours-cell" ${state.editMode ? 'tabindex="0"' : ''} data-index="${idx}" ${selected && state.editMode ? 'aria-current="true"' : ''}>${times.hours}</td>
             </tr>
           `;
         }).join('');
@@ -855,7 +862,7 @@
         const highlightSelection = () => {
           elements.tableBody.querySelectorAll('.hours-cell').forEach((cell) => {
             const idx = Number(cell.dataset.index);
-            cell.classList.toggle('selected', idx === state.selectedDayIndex);
+            cell.classList.toggle('selected', state.editMode && idx === state.selectedDayIndex);
           });
         };
 
@@ -884,6 +891,7 @@
         elements.openBtn.addEventListener('click', openFile);
         elements.reconnectBtn.addEventListener('click', reconnectFile);
         elements.downloadBtn.addEventListener('click', () => downloadData(state.lastFileName || 'dochadzka.json'));
+        elements.editBtn.addEventListener('click', () => { state.editMode = !state.editMode; render(false); });
         elements.signatureBtn.addEventListener('click', uploadSignature);
         elements.printBtn.addEventListener('click', () => window.print());
         elements.newMonthBtn.addEventListener('click', () => { addNewMonth(); });
