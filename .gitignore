@@ -1,0 +1,9 @@
+# Source Excel file (reference only)
+dochadzka.xlsx
+
+# Screenshots
+*.png
+
+# OS files
+.DS_Store
+Thumbs.db
