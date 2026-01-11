@@ -208,10 +208,9 @@
       <button id="createBtn">Vytvoriť súbor</button>
       <button id="openBtn">Otvoriť súbor</button>
       <button id="reconnectBtn" class="ghost" title="Pripojiť posledný súbor">Pripojiť</button>
-      <button id="downloadBtn" class="ghost" disabled>Stiahnuť JSON</button>
-      <button id="editBtn" class="ghost" disabled>Upraviť</button>
-      <button id="signatureBtn" class="ghost" disabled>Podpis</button>
-      <button id="printBtn" class="primary" disabled>Tlačiť</button>
+      <button id="signatureBtn" class="ghost" disabled>Nahrať podpis</button>
+      <button id="printBtn" class="ghost" disabled>Tlačiť</button>
+      <button id="editBtn" class="primary" disabled>Upraviť</button>
       <span id="fileName" class="meta"></span>
     </div>
 
@@ -278,7 +277,6 @@
         createBtn: document.getElementById('createBtn'),
         openBtn: document.getElementById('openBtn'),
         reconnectBtn: document.getElementById('reconnectBtn'),
-        downloadBtn: document.getElementById('downloadBtn'),
         editBtn: document.getElementById('editBtn'),
         signatureBtn: document.getElementById('signatureBtn'),
         printBtn: document.getElementById('printBtn'),
@@ -797,7 +795,6 @@
         elements.editBtn.classList.toggle('primary', state.editMode);
         elements.editBtn.classList.toggle('ghost', !state.editMode);
         elements.signatureBtn.disabled = !hasData;
-        elements.downloadBtn.disabled = !hasData;
         elements.printBtn.disabled = !hasData;
         elements.monthNav.classList.toggle('hidden', !hasData);
         elements.summary.classList.toggle('hidden', !hasData);
@@ -890,7 +887,6 @@
         elements.createBtn.addEventListener('click', createSampleFile);
         elements.openBtn.addEventListener('click', openFile);
         elements.reconnectBtn.addEventListener('click', reconnectFile);
-        elements.downloadBtn.addEventListener('click', () => downloadData(state.lastFileName || 'dochadzka.json'));
         elements.editBtn.addEventListener('click', () => { state.editMode = !state.editMode; render(false); });
         elements.signatureBtn.addEventListener('click', uploadSignature);
         elements.printBtn.addEventListener('click', () => window.print());
