@@ -192,7 +192,7 @@ None - vanilla HTML/CSS/JS only.
 
 **GitHub repository:**
 - Create new public repo: `dochadzka`
-- URL: `https://github.com/<username>/dochadzka`
+- URL: `https://github.com/mcsdodo/dochadzka`
 
 **GitHub Pages deployment via GitHub Action:**
 
@@ -231,7 +231,7 @@ jobs:
 3. Push code with workflow file
 4. Action auto-deploys on every push to master
 
-**Final URL:** `https://<username>.github.io/dochadzka/`
+**Final URL:** `https://mcsdodo.github.io/dochadzka/`
 
 ## Implementation Steps
 
