@@ -77,6 +77,20 @@
     .primary { background: var(--accent); color: #fff; border-color: var(--accent); }
     .ghost { background: #f3f6ff; border-color: #dbe4ff; }
 
+    #editBtn {
+      background: #16a34a;
+      border-color: #16a34a;
+      color: #fff;
+      font-weight: 600;
+      padding: 8px 16px;
+    }
+    #editBtn:hover { background: #15803d; border-color: #15803d; }
+    #editBtn.editing {
+      background: #dc2626;
+      border-color: #dc2626;
+    }
+    #editBtn.editing:hover { background: #b91c1c; border-color: #b91c1c; }
+
     #unsupported {
       background: #fff4d5;
       border: 1px solid #f0cd6f;
@@ -210,7 +224,7 @@
       <button id="reconnectBtn" class="ghost" title="Pripojiť posledný súbor">Pripojiť</button>
       <button id="signatureBtn" class="ghost" disabled>Nahrať podpis</button>
       <button id="printBtn" class="ghost" disabled>Tlačiť</button>
-      <button id="editBtn" class="primary" disabled>Upraviť</button>
+      <button id="editBtn" disabled>Upraviť</button>
       <span id="fileName" class="meta"></span>
     </div>
 
@@ -792,8 +806,7 @@
         const hasData = Boolean(state.data && state.selectedMonthKey);
         elements.editBtn.disabled = !hasData;
         elements.editBtn.textContent = state.editMode ? 'Hotovo' : 'Upraviť';
-        elements.editBtn.classList.toggle('primary', state.editMode);
-        elements.editBtn.classList.toggle('ghost', !state.editMode);
+        elements.editBtn.classList.toggle('editing', state.editMode);
         elements.signatureBtn.disabled = !hasData;
         elements.printBtn.disabled = !hasData;
         elements.monthNav.classList.toggle('hidden', !hasData);
