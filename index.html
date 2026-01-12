@@ -232,7 +232,7 @@
 
     /* Cestovný príkaz document styles */
     .cp-doc, .vu-doc { font-size: 11px; line-height: 1.4; }
-    .cp-title, .vu-title { text-align: center; font-weight: bold; font-size: 16px; margin-bottom: 8px; }
+    .cp-title-bar { text-align: center; font-weight: bold; font-size: 14px; background: #c6efce; border: 1px solid #006100; padding: 4px; margin-bottom: 4px; }
     .cp-header { display: flex; justify-content: space-between; margin-bottom: 8px; border: 1px solid var(--border); padding: 6px; }
     .cp-header-left { }
     .cp-company { font-weight: bold; font-size: 12px; }
@@ -250,7 +250,8 @@
     .cp-value-box { border: 1px solid var(--border); padding: 2px 6px; min-width: 50px; text-align: center; }
     .cp-journey-table { width: 100%; border-collapse: collapse; margin: 6px 0; font-size: 10px; }
     .cp-journey-table th, .cp-journey-table td { border: 1px solid var(--border); padding: 4px; text-align: left; vertical-align: top; }
-    .cp-journey-table th { background: var(--surface); font-weight: 600; }
+    .cp-journey-table th { background: #ffffcc; font-weight: 600; }
+    .cp-yellow-header { background: #ffffcc; padding: 2px 6px; }
     .cp-journey-table small { font-size: 9px; color: var(--muted); }
     .cp-dots { flex: 1; border-bottom: 1px dotted var(--muted); margin: 0 4px; }
     .cp-dots-short { width: 80px; border-bottom: 1px dotted var(--muted); margin: 0 4px; }
@@ -260,12 +261,17 @@
     .cp-approval { margin: 8px 0; text-align: center; }
     .cp-approval-date { font-weight: 600; }
     .cp-sig-img { max-height: 40px; display: block; margin: 4px auto; }
-    .cp-accounting { border: 1px solid var(--border); padding: 6px; font-size: 10px; }
-    .cp-accounting-header { display: flex; justify-content: space-between; }
-    .cp-accounting-right { text-align: right; }
-    .cp-accounting-table { border-collapse: collapse; font-size: 9px; margin-top: 4px; }
-    .cp-accounting-table th, .cp-accounting-table td { border: 1px solid var(--border); padding: 2px 4px; min-width: 40px; }
+    .cp-accounting { border: 1px solid #000; padding: 6px; font-size: 10px; display: flex; gap: 12px; }
+    .cp-accounting-left { flex: 1; border-right: 1px solid #000; padding-right: 12px; }
+    .cp-accounting-right { flex: 1; }
+    .cp-accounting-box { border: 1px solid #000; }
+    .cp-accounting-title { background: #c6efce; border-bottom: 1px solid #000; padding: 2px 6px; text-align: center; font-weight: 600; }
+    .cp-accounting-table { border-collapse: collapse; font-size: 9px; width: 100%; }
+    .cp-accounting-table th, .cp-accounting-table td { border: 1px solid #000; padding: 2px 4px; min-width: 50px; }
+    .cp-accounting-table tbody td { height: 18px; }
+    .cp-accounting-table th { background: #ffffcc; }
     .cp-accounting-body { margin-top: 8px; }
+    .cp-accounting-footer { background: #dce6f1; border-top: 1px solid #000; padding: 2px 6px; font-size: 9px; }
     .cp-mid-signatures { display: flex; gap: 24px; margin-top: 8px; }
     .cp-footer-signatures { display: flex; justify-content: space-between; margin-top: 12px; gap: 8px; }
     .cp-sig-block { flex: 1; text-align: center; position: relative; }
@@ -359,7 +365,8 @@
       .document-container { border: none; padding: 0; margin: 0; page-break-inside: avoid; }
       #cestovnyPrikaz { page-break-after: always; }
       #vyuctovanie { page-break-before: always; }
-      .cp-title, .vu-title { font-size: 18px; margin-bottom: 16px; }
+      .cp-title-bar, .vu-title-bar { background: #c6efce !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .cp-journey-table th, .cp-yellow-header { background: #ffffcc !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .cp-section { margin: 12px 0; }
       .cp-row, .vu-header p { font-size: 12px; margin: 6px 0; }
       .cp-label { min-width: 180px; }
@@ -809,7 +816,7 @@
         const lastDayOfMonth = `${lastDay}.${month}.${year}`;
         return `
           <div class="cp-doc">
-            <div class="cp-title">Cestovný príkaz</div>
+            <div class="cp-title-bar">CESTOVNÝ PRÍKAZ</div>
 
             <div class="cp-header">
               <div class="cp-header-left">
@@ -892,23 +899,25 @@
             </div>
 
             <div class="cp-section cp-accounting">
-              <div class="cp-accounting-header">
-                <span class="cp-label-num">8. VÝDAJOVÝ A PRÍJMOVÝ DOKLAD číslo</span>
-                <div class="cp-accounting-right">
-                  <div class="cp-label">Účtovací predpis</div>
+              <div class="cp-accounting-left">
+                <div class="cp-label-num">8. VÝDAJOVÝ A PRÍJMOVÝ DOKLAD číslo</div>
+                <div class="cp-accounting-body">
+                  <div class="cp-field-full"><span>Účtovná náhrada bola preskúšaná a upravená v EUR</span><span class="cp-dots"></span></div>
+                  <div class="cp-field-full"><span>Vyplatená záloha</span><span class="cp-dots-short"></span><span>EUR</span><span class="cp-dots"></span></div>
+                  <div class="cp-field-full"><span>Doplatok - Preplatok</span><span class="cp-dots-short"></span><span>EUR</span><span class="cp-dots"></span></div>
+                  <div class="cp-field-full"><span>Slovom</span><span class="cp-dots"></span></div>
+                </div>
+              </div>
+              <div class="cp-accounting-right">
+                <div class="cp-accounting-box">
+                  <div class="cp-accounting-title">Účtovací predpis</div>
                   <table class="cp-accounting-table">
                     <tr><th>Má dať</th><th>Dal</th><th>Čiastka</th><th>Stredisko</th><th>Zákazka</th></tr>
                     <tr><td></td><td></td><td></td><td></td><td></td></tr>
                     <tr><td></td><td></td><td></td><td></td><td></td></tr>
                   </table>
+                  <div class="cp-accounting-footer">Poznámka o zaúčtovaní</div>
                 </div>
-              </div>
-              <div class="cp-accounting-body">
-                <div class="cp-field-full"><span>Účtovná náhrada bola preskúšaná a upravená v EUR</span><span class="cp-dots"></span></div>
-                <div class="cp-field-full"><span>Vyplatená záloha</span><span class="cp-dots-short"></span><span>EUR</span><span class="cp-dots"></span></div>
-                <div class="cp-field-full"><span>Doplatok - Preplatok</span><span class="cp-dots-short"></span><span>EUR</span><span class="cp-dots"></span></div>
-                <div class="cp-field-full"><span>Slovom</span><span class="cp-dots"></span></div>
-                <div class="cp-field-full"><span>Poznámka o zaúčtovaní</span></div>
               </div>
             </div>
 
