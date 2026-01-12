@@ -28,3 +28,4 @@ desktop.ini
 # Claude Code
 .claude/
 tmpclaude-*
+generate-screenshots.mjs

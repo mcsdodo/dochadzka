@@ -4,7 +4,17 @@ Jednoduchá webová aplikácia na evidenciu pracovného času zamestnanca. Fungu
 
 **Aplikácia:** https://mcsdodo.github.io/dochadzka/
 
-![Screenshot](screenshot.png)
+## Snímky obrazovky
+
+### Pohľad na evidenciu dochádzky
+Hlavný pohľad aplikácie s mesiacovým prehľadom pracovného času. Zobrazuje jednotlivé dni s typom činnosti (pracovný deň, voľno, dovolenka, služobná cesta, atď.).
+
+![Screenshot Dochádzka](screenshot-dochadzka.png)
+
+### Pohľad na služobné cesty
+Pohľad s detailmi služobných ciest vrátane vygenerovaných dokumentov - Cestovného príkazu a Vyúčtovania. Umožňuje potvrdenie služobnej cesty a tlač potrebných dokladov.
+
+![Screenshot Služobné cesty](screenshot-sc.png)
 
 ## Ako začať
 
