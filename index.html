@@ -229,24 +229,75 @@
       background: #fff;
     }
 
-    /* Document styles */
-    .cp-title, .vu-title {
-      text-align: center;
-      font-weight: bold;
-      font-size: 16px;
-      margin-bottom: 12px;
-      text-decoration: underline;
-    }
-    .cp-section { margin: 8px 0; }
-    .cp-row, .vu-header p { display: flex; gap: 8px; margin: 4px 0; font-size: 13px; }
-    .cp-label { font-weight: 600; min-width: 160px; }
-    .cp-signature { margin-top: 20px; }
-    .cp-signature img, .vu-signature img { max-height: 50px; }
-    .vu-table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 8px 0; }
-    .vu-table th, .vu-table td { border: 1px solid var(--border); padding: 4px 6px; text-align: left; }
-    .vu-table th { background: var(--surface); font-weight: 600; }
+    /* Cestovný príkaz document styles */
+    .cp-doc, .vu-doc { font-size: 11px; line-height: 1.4; }
+    .cp-title, .vu-title { text-align: center; font-weight: bold; font-size: 16px; margin-bottom: 8px; }
+    .cp-header { display: flex; justify-content: space-between; margin-bottom: 8px; border: 1px solid var(--border); padding: 6px; }
+    .cp-header-left { }
+    .cp-company { font-weight: bold; font-size: 12px; }
+    .cp-address { font-size: 10px; color: var(--muted); }
+    .cp-header-right { text-align: right; }
+    .cp-field { display: flex; justify-content: space-between; gap: 8px; margin: 2px 0; }
+    .cp-label { font-size: 10px; }
+    .cp-value { min-width: 60px; border-bottom: 1px solid var(--border); }
+    .cp-section { margin: 6px 0; }
+    .cp-bordered { border: 1px solid var(--border); padding: 4px 6px; }
+    .cp-field-full { display: flex; gap: 8px; margin: 3px 0; }
+    .cp-label-num { font-weight: 600; }
+    .cp-value-large { flex: 1; }
+    .cp-field-inline { display: flex; gap: 8px; align-items: center; }
+    .cp-value-box { border: 1px solid var(--border); padding: 2px 6px; min-width: 50px; text-align: center; }
+    .cp-journey-table { width: 100%; border-collapse: collapse; margin: 6px 0; font-size: 10px; }
+    .cp-journey-table th, .cp-journey-table td { border: 1px solid var(--border); padding: 4px; text-align: left; vertical-align: top; }
+    .cp-journey-table th { background: var(--surface); font-weight: 600; }
+    .cp-journey-table small { font-size: 9px; color: var(--muted); }
+    .cp-dots { flex: 1; border-bottom: 1px dotted var(--muted); margin: 0 4px; }
+    .cp-dots-short { width: 80px; border-bottom: 1px dotted var(--muted); margin: 0 4px; }
+    .cp-dots-wide { width: 200px; border-bottom: 1px solid var(--border); }
+    .cp-signature-line { margin: 8px 0; }
+    .cp-sig-label { font-size: 9px; color: var(--muted); text-align: center; }
+    .cp-approval { margin: 8px 0; text-align: center; }
+    .cp-approval-date { font-weight: 600; }
+    .cp-sig-img { max-height: 40px; display: block; margin: 4px auto; }
+    .cp-accounting { border: 1px solid var(--border); padding: 6px; font-size: 10px; }
+    .cp-accounting-header { display: flex; justify-content: space-between; }
+    .cp-accounting-right { text-align: right; }
+    .cp-accounting-table { border-collapse: collapse; font-size: 9px; margin-top: 4px; }
+    .cp-accounting-table th, .cp-accounting-table td { border: 1px solid var(--border); padding: 2px 4px; min-width: 40px; }
+    .cp-accounting-body { margin-top: 8px; }
+    .cp-footer-signatures { display: flex; justify-content: space-between; margin-top: 12px; gap: 8px; }
+    .cp-sig-block { flex: 1; text-align: center; }
+    .cp-sig-date { font-weight: 600; margin-bottom: 4px; }
+    .cp-sig-line { border-top: 1px solid var(--border); margin: 4px 0; }
+
+    /* Vyúčtovanie document styles */
+    .vu-header-info { margin: 8px 0; font-size: 11px; }
+    .vu-journey-info { margin: 3px 0; }
+    .vu-label { font-weight: 600; }
+    .vu-value { }
+    .vu-table { width: 100%; border-collapse: collapse; font-size: 10px; margin: 8px 0; }
+    .vu-table th, .vu-table td { border: 1px solid var(--border); padding: 3px 4px; text-align: center; vertical-align: middle; }
+    .vu-table th { background: var(--surface); font-weight: 600; font-size: 9px; }
+    .vu-table .vu-date { font-weight: 600; }
+    .vu-table .vu-time { font-size: 9px; }
     .vu-totals td { font-weight: 600; background: var(--surface); }
-    .vu-signature { margin-top: 16px; font-size: 13px; }
+    .vu-meals-section { margin: 8px 0; font-size: 10px; }
+    .vu-checkbox { margin-left: 8px; }
+    .vu-legend { margin: 8px 0; font-size: 9px; border: 1px solid var(--border); padding: 6px; }
+    .vu-legend-note { margin: 4px 0; font-style: italic; }
+    .vu-legend-cols { display: flex; gap: 24px; margin: 6px 0; }
+    .vu-legend-col { }
+    .vu-totals-section { margin: 8px 0; font-size: 11px; }
+    .vu-total-row { display: flex; align-items: center; margin: 4px 0; }
+    .vu-dots { flex: 1; border-bottom: 1px dotted var(--muted); margin: 0 8px; }
+    .vu-declaration { margin: 12px 0; font-size: 10px; }
+    .vu-law-ref { font-size: 9px; color: var(--muted); margin-top: 4px; }
+    .vu-footer-signatures { margin-top: 16px; }
+    .vu-sig-block { text-align: center; max-width: 200px; }
+    .vu-sig-date { font-weight: 600; }
+    .vu-sig-img { max-height: 40px; display: block; margin: 4px auto; }
+    .vu-sig-line { border-top: 1px solid var(--border); margin: 4px 0; }
+    .vu-sig-label { font-size: 9px; color: var(--muted); }
 
     .hidden { display: none; }
 
@@ -740,31 +791,132 @@
 
       function renderCestovnyPrikaz(trip, monthKey, config, scConfig) {
         const [month, year] = monthKey.split('-');
-        const startDateStr = `${trip.startDay}.${month}.${year} ${trip.startTime}`;
-        const endDateStr = `${trip.endDay}.${month}.${year} ${trip.endTime || '??:??'}`;
-        const signatureDate = `01.${month}.${year}`;
+        const startDateStr = `${scConfig.address}, ${trip.startDay}.${month}.${year} ${trip.startTime}`;
+        const endDateStr = `${scConfig.address}, ${trip.endDay}.${month}.${year} ${trip.endTime || '??:??'}`;
+        const firstDayOfMonth = `01.${month}.${year}`;
+        const lastDay = new Date(parseInt(year), parseInt(month), 0).getDate();
+        const lastDayOfMonth = `${lastDay}.${month}.${year}`;
         return `
-          <div class="cp-title">CESTOVNÝ PRÍKAZ</div>
-          <div class="cp-section">
-            <div class="cp-row"><span class="cp-label">Zamestnávateľ:</span><span>${config.employerName}</span></div>
-            <div class="cp-row"><span class="cp-label">Adresa:</span><span>${scConfig.address}</span></div>
-          </div>
-          <div class="cp-section">
-            <div class="cp-row"><span class="cp-label">Zamestnanec:</span><span>${config.employeeName}</span></div>
-          </div>
-          <div class="cp-section">
-            <div class="cp-row"><span class="cp-label">Dátum a čas odchodu:</span><span>${startDateStr}</span></div>
-            <div class="cp-row"><span class="cp-label">Dátum a čas príchodu:</span><span>${endDateStr}</span></div>
-            <div class="cp-row"><span class="cp-label">Miesto konania:</span><span>${scConfig.destination}</span></div>
-            <div class="cp-row"><span class="cp-label">Účel cesty:</span><span>${scConfig.purpose}</span></div>
-          </div>
-          <div class="cp-section">
-            <div class="cp-row"><span class="cp-label">Dopravný prostriedok:</span><span>${scConfig.vehicleType}</span></div>
-            <div class="cp-row"><span class="cp-label">ŠPZ:</span><span>${scConfig.licensePlate}</span></div>
-          </div>
-          <div class="cp-signature">
-            <div class="cp-row"><span class="cp-label">Dátum:</span><span>${signatureDate}</span></div>
-            <div class="cp-row"><span class="cp-label">Podpis:</span><img src="${config.signaturePng}" alt="Podpis" /></div>
+          <div class="cp-doc">
+            <div class="cp-title">Cestovný príkaz</div>
+
+            <div class="cp-header">
+              <div class="cp-header-left">
+                <div class="cp-company">${config.employerName}</div>
+                <div class="cp-address">${scConfig.companyAddress || scConfig.address}</div>
+              </div>
+              <div class="cp-header-right">
+                <div class="cp-field"><span class="cp-label">Osobné číslo</span><span class="cp-value"></span></div>
+                <div class="cp-field"><span class="cp-label">Útvar</span><span class="cp-value"></span></div>
+                <div class="cp-field"><span class="cp-label">Telefón, linka</span><span class="cp-value"></span></div>
+              </div>
+            </div>
+
+            <div class="cp-section cp-bordered">
+              <div class="cp-field-full"><span class="cp-label-num">2. Priezvisko, meno, titl. zamestnanca:</span><span class="cp-value-large">${config.employeeName}</span></div>
+              <div class="cp-field-inline">
+                <span class="cp-label">Normálna pracovná doba</span>
+                <span class="cp-label">od</span><span class="cp-value-box">08:00</span>
+                <span class="cp-label">do</span><span class="cp-value-box">16:30</span>
+              </div>
+            </div>
+
+            <div class="cp-section cp-bordered">
+              <div class="cp-field-full"><span class="cp-label-num">3. Bydlisko</span><span class="cp-value-large">${scConfig.address}</span></div>
+            </div>
+
+            <table class="cp-journey-table">
+              <thead>
+                <tr>
+                  <th>Začiatok cesty<br><small>(miesto, dátum, hodina)</small></th>
+                  <th>Miesto konania</th>
+                  <th>Účel a priebeh cesty</th>
+                  <th>Koniec cesty<br><small>(miesto, dátum, hodina)</small></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>${startDateStr}</td>
+                  <td>${scConfig.destination}</td>
+                  <td>${scConfig.purpose}</td>
+                  <td>${endDateStr}</td>
+                </tr>
+                <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+              </tbody>
+            </table>
+
+            <div class="cp-section">
+              <div class="cp-field-full"><span class="cp-label-num">4. Spolucestujúci</span><span class="cp-dots"></span></div>
+            </div>
+
+            <div class="cp-section">
+              <div class="cp-field-full"><span class="cp-label-num">5. Určený dopravný prostriedok:</span><span class="cp-value-large">${scConfig.vehicleType} ${scConfig.licensePlate}</span></div>
+            </div>
+
+            <div class="cp-section">
+              <div class="cp-field-full"><span class="cp-label-num">6. Predpokladaná čiastka výdajov v EUR</span><span class="cp-dots"></span></div>
+            </div>
+
+            <div class="cp-section">
+              <div class="cp-field-full">
+                <span class="cp-label-num">7. Povolená záloha v EUR</span><span class="cp-dots-short"></span>
+                <span class="cp-label">vyplatená dňa</span><span class="cp-dots-short"></span>
+                <span class="cp-label">pokladničný doklad číslo</span><span class="cp-dots-short"></span>
+              </div>
+              <div class="cp-signature-line">
+                <span class="cp-dots-wide"></span>
+                <div class="cp-sig-label">Podpis pokladníka</div>
+              </div>
+              <div class="cp-approval">
+                <div class="cp-approval-date">${firstDayOfMonth}</div>
+                <div class="cp-sig-label">Dátum a podpis pracovníka oprávneného k povoleniu cesty</div>
+                ${config.signaturePng ? `<img src="${config.signaturePng}" alt="Podpis" class="cp-sig-img" />` : ''}
+              </div>
+            </div>
+
+            <div class="cp-section cp-accounting">
+              <div class="cp-accounting-header">
+                <span class="cp-label-num">8. VÝDAJOVÝ A PRÍJMOVÝ DOKLAD číslo</span>
+                <div class="cp-accounting-right">
+                  <div class="cp-label">Účtovací predpis</div>
+                  <table class="cp-accounting-table">
+                    <tr><th>Má dať</th><th>Dal</th><th>Čiastka</th><th>Stredisko</th><th>Zákazka</th></tr>
+                    <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="cp-accounting-body">
+                <div class="cp-field-full"><span>Účtovná náhrada bola preskúšaná a upravená v EUR</span><span class="cp-dots"></span></div>
+                <div class="cp-field-full"><span>Vyplatená záloha</span><span class="cp-dots-short"></span><span>EUR</span><span class="cp-dots"></span></div>
+                <div class="cp-field-full"><span>Doplatok - Preplatok</span><span class="cp-dots-short"></span><span>EUR</span><span class="cp-dots"></span></div>
+                <div class="cp-field-full"><span>Slovom</span><span class="cp-dots"></span></div>
+                <div class="cp-field-full"><span>Poznámka o zaúčtovaní</span></div>
+              </div>
+            </div>
+
+            <div class="cp-footer-signatures">
+              <div class="cp-sig-block">
+                <div class="cp-sig-date">${lastDayOfMonth}</div>
+                <div class="cp-sig-line"></div>
+                <div class="cp-sig-label">Dátum a podpis pracovníka,<br>ktorý upravil vyúčtovanie</div>
+              </div>
+              <div class="cp-sig-block">
+                ${config.signaturePng ? `<img src="${config.signaturePng}" alt="Podpis" class="cp-sig-img" />` : ''}
+                <div class="cp-sig-line"></div>
+                <div class="cp-sig-label">Dátum a podpis pokladníka</div>
+              </div>
+              <div class="cp-sig-block">
+                <div class="cp-sig-line"></div>
+                <div class="cp-sig-label">Dátum a podpis príjemcu<br>(preukaz totožnosti)</div>
+              </div>
+              <div class="cp-sig-block">
+                <div class="cp-sig-date">${lastDayOfMonth}</div>
+                ${config.signaturePng ? `<img src="${config.signaturePng}" alt="Podpis" class="cp-sig-img" />` : ''}
+                <div class="cp-sig-line"></div>
+                <div class="cp-sig-label">Schválil<br>(dátum a podpis)</div>
+              </div>
+            </div>
           </div>
         `;
       }
@@ -781,7 +933,7 @@
         for (let d = startDay; d <= endDay; d++) {
           const dayStr = String(d).padStart(2, '0');
           const dateStr = `${dayStr}.${month}.${year}`;
-          let aus = '-', km = '-', timeFrom = '00:00', timeTo = '23:59';
+          let aus = '', km = '', timeFrom = '00:00', timeTo = '23:59';
           if (isSingleDay) {
             aus = 'AUS'; km = trip.km; timeFrom = trip.startTime; timeTo = trip.endTime || '23:59';
           } else if (d === startDay) {
@@ -791,27 +943,126 @@
           }
           const hours = calculateHoursBetween(timeFrom, timeTo);
           const perDiem = getPerDiem(hours, rates);
-          if (km !== '-') totalKm += km;
+          if (km !== '') totalKm += km;
           totalPerDiem += perDiem;
-          tableRows += `<tr><td>${dateStr}</td><td>${aus}</td><td>${km}</td><td>${timeFrom}</td><td>${timeTo}</td><td>${hours.toFixed(1)}</td><td>${perDiem.toFixed(2)} €</td></tr>`;
+          tableRows += `
+            <tr class="vu-day-row">
+              <td rowspan="2" class="vu-date">${dateStr}</td>
+              <td rowspan="2" class="vu-aus">${aus}</td>
+              <td rowspan="2" class="vu-km">${km}</td>
+              <td class="vu-time">${timeFrom}</td>
+              <td rowspan="2" class="vu-stravne">${perDiem.toFixed(2)}</td>
+              <td rowspan="2" class="vu-ubyt"></td>
+              <td rowspan="2" class="vu-vedl"></td>
+              <td rowspan="2" class="vu-celkom">${perDiem.toFixed(2)}</td>
+              <td rowspan="2" class="vu-upravene">${perDiem.toFixed(2)}</td>
+            </tr>
+            <tr class="vu-time-row">
+              <td class="vu-time">${timeTo}</td>
+            </tr>`;
         }
         const lastDay = new Date(parseInt(year), parseInt(month), 0).getDate();
-        const sigDate = `${lastDay}.${month}.${year}`;
+        const lastDayOfMonth = `${lastDay}.${month}.${year}`;
+        const startDateFull = `${scConfig.address}, ${trip.startDay}.${month}.${year} ${trip.startTime}`;
+        const endDateFull = `${scConfig.address}, ${trip.endDay}.${month}.${year} ${trip.endTime || '??:??'}`;
         return `
-          <div class="vu-title">VYÚČTOVANIE PRACOVNEJ CESTY</div>
-          <div class="vu-header">
-            <p><strong>Zamestnanec:</strong> ${config.employeeName}</p>
-            <p><strong>Zamestnávateľ:</strong> ${config.employerName}</p>
-            <p><strong>Služobná cesta:</strong> ${trip.id}</p>
-          </div>
-          <table class="vu-table">
-            <thead><tr><th>Dátum</th><th>AUS</th><th>KM</th><th>Čas od</th><th>Čas do</th><th>Hodiny</th><th>Stravné</th></tr></thead>
-            <tbody>${tableRows}</tbody>
-            <tfoot><tr class="vu-totals"><td colspan="2"><strong>SPOLU</strong></td><td><strong>${totalKm}</strong></td><td colspan="3"></td><td><strong>${totalPerDiem.toFixed(2)} €</strong></td></tr></tfoot>
-          </table>
-          <div class="vu-signature">
-            <p><strong>Dátum:</strong> ${sigDate}</p>
-            <p><strong>Podpis:</strong> <img src="${config.signaturePng}" alt="Podpis" /></p>
+          <div class="vu-doc">
+            <div class="vu-title">VYÚČTOVANIE PRACOVNEJ CESTY</div>
+
+            <div class="vu-header-info">
+              <div class="vu-journey-info">
+                <span class="vu-label">Začiatok cesty:</span> <span class="vu-value">${startDateFull}</span>
+              </div>
+              <div class="vu-journey-info">
+                <span class="vu-label">Miesto konania:</span> <span class="vu-value">${scConfig.destination}</span>
+              </div>
+              <div class="vu-journey-info">
+                <span class="vu-label">Koniec cesty:</span> <span class="vu-value">${endDateFull}</span>
+              </div>
+            </div>
+
+            <table class="vu-table">
+              <thead>
+                <tr>
+                  <th rowspan="2">Dátum</th>
+                  <th rowspan="2">1)</th>
+                  <th rowspan="2">2)</th>
+                  <th colspan="1"></th>
+                  <th rowspan="2">Stravné</th>
+                  <th rowspan="2">Ubytovanie</th>
+                  <th rowspan="2">Potrebné<br>vedľajšie<br>výdavky</th>
+                  <th rowspan="2">Celkom</th>
+                  <th rowspan="2">Upravené<br>EUR</th>
+                </tr>
+                <tr>
+                  <th>Odchod<br>Príchod</th>
+                </tr>
+              </thead>
+              <tbody>${tableRows}</tbody>
+              <tfoot>
+                <tr class="vu-totals">
+                  <td colspan="3"><strong>Celkom</strong></td>
+                  <td></td>
+                  <td><strong>${totalPerDiem.toFixed(2)}</strong></td>
+                  <td></td>
+                  <td></td>
+                  <td><strong>${totalPerDiem.toFixed(2)}</strong></td>
+                  <td><strong>${totalPerDiem.toFixed(2)}</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+
+            <div class="vu-meals-section">
+              <span>Bolo poskytnuté bezplatné stravovanie:</span>
+              <span class="vu-checkbox">☐ áno</span>
+              <span class="vu-checkbox">☑ nie</span>
+            </div>
+
+            <div class="vu-legend">
+              <div class="vu-legend-note">1) Uvádzajte v skratke</div>
+              <div class="vu-legend-cols">
+                <div class="vu-legend-col">
+                  <div>O - Osobný vlak</div>
+                  <div>R - Rýchlik</div>
+                  <div>A - Autobus</div>
+                  <div>L - Lietadlo</div>
+                </div>
+                <div class="vu-legend-col">
+                  <div>AUS - auto služobné</div>
+                  <div>AUV - auto vlastné</div>
+                  <div>MOS - motocykel služobný</div>
+                  <div>MOV - motocykel vlastný</div>
+                </div>
+              </div>
+              <div class="vu-legend-note">2) Počet km uvádzajte len pri použití iného ako verejného hromadného dopravného prostriedku</div>
+            </div>
+
+            <div class="vu-totals-section">
+              <div class="vu-total-row">
+                <span class="vu-label">Záloha</span>
+                <span class="vu-dots"></span>
+                <span class="vu-value"></span>
+              </div>
+              <div class="vu-total-row">
+                <span class="vu-label">Doplatok - Preplatok</span>
+                <span class="vu-dots"></span>
+                <span class="vu-value">${totalPerDiem.toFixed(2)} €</span>
+              </div>
+            </div>
+
+            <div class="vu-declaration">
+              <p>Vyhlasujem, že všetky údaje som uviedol úplné a správne.</p>
+              <p class="vu-law-ref">Sadzby cestovných náhrad sú uverejňované v Zbierke zákonov podľa príslušných ustanovení zákona č. 283/2002 Z.z. o cestovných náhradách v znení neskorších predpisov.</p>
+            </div>
+
+            <div class="vu-footer-signatures">
+              <div class="vu-sig-block">
+                <div class="vu-sig-date">${lastDayOfMonth}</div>
+                ${config.signaturePng ? `<img src="${config.signaturePng}" alt="Podpis" class="vu-sig-img" />` : ''}
+                <div class="vu-sig-line"></div>
+                <div class="vu-sig-label">Dátum a podpis zamestnanca</div>
+              </div>
+            </div>
           </div>
         `;
       }
@@ -1307,9 +1558,28 @@
         elements.nextMonth.addEventListener('click', () => changeMonth(1));
         document.addEventListener('keydown', handleKeydown);
 
-        // View tabs
-        elements.tabDochadzka.addEventListener('click', () => { state.currentView = 'dochadzka'; render(false); });
-        elements.tabSC.addEventListener('click', () => { state.currentView = 'sc'; render(false); });
+        // View tabs with hash routing
+        function setViewFromHash() {
+          const hash = window.location.hash;
+          if (hash === '#sluzobne-cesty') {
+            state.currentView = 'sc';
+          } else {
+            state.currentView = 'dochadzka';
+          }
+        }
+        function navigateToView(view) {
+          const hash = view === 'sc' ? '#sluzobne-cesty' : '#dochadzka';
+          if (window.location.hash !== hash) {
+            window.location.hash = hash;
+          } else {
+            state.currentView = view;
+            render(false);
+          }
+        }
+        elements.tabDochadzka.addEventListener('click', () => navigateToView('dochadzka'));
+        elements.tabSC.addEventListener('click', () => navigateToView('sc'));
+        window.addEventListener('hashchange', () => { setViewFromHash(); render(false); });
+        setViewFromHash(); // Set initial view from hash
 
         // Trip navigation
         elements.prevTrip.addEventListener('click', () => { state.selectedTripIndex--; render(false); });
