@@ -900,6 +900,28 @@
         }
       }
 
+      function loadTestData() {
+        const params = new URLSearchParams(window.location.search);
+        if (!params.has('test')) return false;
+        const stored = localStorage.getItem('testData');
+        if (!stored) return false;
+        try {
+          const data = normalizeData(JSON.parse(stored));
+          state.data = data;
+          state.fileHandle = null;
+          const monthKeys = getSortedMonthKeys(data.months);
+          state.selectedMonthKey = monthKeys[0] || null;
+          state.selectedDayIndex = 0;
+          state.lastFileName = 'test-mode.json';
+          render(false);
+          console.log('[TEST MODE] Loaded data from localStorage');
+          return true;
+        } catch (err) {
+          console.error('[TEST MODE] Failed to load:', err);
+          return false;
+        }
+      }
+
       function init() {
         elements.createBtn.addEventListener('click', createSampleFile);
         elements.openBtn.addEventListener('click', openFile);
@@ -916,6 +938,9 @@
           elements.unsupported.style.display = 'block';
         }
         render(false);
+
+        // Test mode: load from localStorage if ?test in URL
+        if (loadTestData()) return;
 
         (async () => {
           const stored = await loadStoredHandle();
