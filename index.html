@@ -169,6 +169,84 @@
       font-size: 13px;
     }
 
+    /* View tabs */
+    .view-tabs {
+      display: flex;
+      gap: 4px;
+      margin-right: auto;
+      align-items: center;
+    }
+    .view-tabs button {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      border: 1px solid var(--border);
+      background: #f3f6ff;
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .view-tabs button:hover { border-color: #b5b8c4; }
+    .view-tabs button.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* SC view styles */
+    .sc-view { margin-top: 8px; }
+    .trip-list { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
+    .trip-item {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 8px;
+      background: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .trip-confirmed { border-left: 4px solid #16a34a; }
+    .trip-unconfirmed { border-left: 4px solid #f59e0b; }
+    .trip-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin: 8px 0;
+      flex-wrap: wrap;
+    }
+    .trip-controls label { font-size: 13px; color: var(--muted); }
+    .trip-controls input {
+      padding: 4px 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      width: 80px;
+    }
+    .document-container {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      margin: 8px 0;
+      background: #fff;
+    }
+
+    /* Document styles */
+    .cp-title, .vu-title {
+      text-align: center;
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 12px;
+      text-decoration: underline;
+    }
+    .cp-section { margin: 8px 0; }
+    .cp-row, .vu-header p { display: flex; gap: 8px; margin: 4px 0; font-size: 13px; }
+    .cp-label { font-weight: 600; min-width: 160px; }
+    .cp-signature { margin-top: 20px; }
+    .cp-signature img, .vu-signature img { max-height: 50px; }
+    .vu-table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 8px 0; }
+    .vu-table th, .vu-table td { border: 1px solid var(--border); padding: 4px 6px; text-align: left; }
+    .vu-table th { background: var(--surface); font-weight: 600; }
+    .vu-totals td { font-weight: 600; background: var(--surface); }
+    .vu-signature { margin-top: 16px; font-size: 13px; }
 
     .hidden { display: none; }
 
@@ -201,7 +279,7 @@
       @page { size: A4 portrait; margin: 10mm; }
       body { background: #fff; padding: 0; color: #000; font-size: 11px; }
       main { border: none; box-shadow: none; margin: 0; padding: 0; }
-      #topbar, #monthNav, #unsupported { display: none !important; }
+      #topbar, #monthNav, #unsupported, #insecure { display: none !important; }
       button { display: none !important; }
       .selected { outline: none; background: transparent; }
       h1 { color: #000; text-decoration: underline; margin: 6px 0 4px; font-size: 16px; }
@@ -214,6 +292,23 @@
       .legend { color: #000; font-size: 10px; }
       .screen-only { display: none; }
       .week-end td { border-bottom-color: #000; }
+
+      /* SC view print styles */
+      #tripNav, #tripList, #tripControls { display: none !important; }
+      #scDocuments { display: block !important; }
+      .document-container { border: none; padding: 0; margin: 0; page-break-inside: avoid; }
+      #cestovnyPrikaz { page-break-after: always; }
+      #vyuctovanie { page-break-before: always; }
+      .cp-title, .vu-title { font-size: 18px; margin-bottom: 16px; }
+      .cp-section { margin: 12px 0; }
+      .cp-row, .vu-header p { font-size: 12px; margin: 6px 0; }
+      .cp-label { min-width: 180px; }
+      .cp-signature, .vu-signature { margin-top: 30px; }
+      .cp-signature img, .vu-signature img { max-height: 60px; }
+      .vu-table { font-size: 11px; }
+      .vu-table th, .vu-table td { border-color: #000; padding: 6px 8px; }
+      .vu-table th { background: #f0f0f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .vu-totals td { background: #f0f0f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
   </style>
 </head>
@@ -223,6 +318,10 @@
     <div id="insecure" class="hidden">Aplikácia potrebuje bezpečný kontext (https:// alebo http://localhost), aby fungovalo uloženie prístupu k súboru a automatické pripojenie.</div>
 
     <div id="topbar" class="controls">
+      <div class="view-tabs">
+        <button id="tabDochadzka" class="active">Dochádzka</button>
+        <button id="tabSC">Služobné cesty</button>
+      </div>
       <button id="createBtn">Vytvoriť súbor</button>
       <button id="openBtn">Otvoriť súbor</button>
       <button id="reconnectBtn" class="ghost" title="Pripojiť posledný súbor">Pripojiť</button>
@@ -232,6 +331,7 @@
       <span id="fileName" class="meta"></span>
     </div>
 
+    <div id="dochadzkaView">
     <div id="monthNav" class="hidden">
       <button id="prevMonth" title="Predošlý mesiac">◀</button>
       <div id="monthLabel"></div>
@@ -285,6 +385,28 @@
       <span>Podpis:</span>
       <img id="signatureImg" alt="Podpis" />
     </div>
+    </div><!-- /dochadzkaView -->
+
+    <div id="scView" class="sc-view hidden">
+      <div id="tripNav" class="hidden">
+        <button id="prevTrip">◀</button>
+        <div id="tripLabel"></div>
+        <button id="nextTrip">▶</button>
+      </div>
+
+      <div id="tripList" class="trip-list"></div>
+
+      <div id="tripControls" class="trip-controls hidden">
+        <label>Odchod: <input type="time" id="tripStartTime" /></label>
+        <label>Príchod: <input type="time" id="tripEndTime" /></label>
+        <label>KM: <input type="number" id="tripKm" style="width:60px" /></label>
+      </div>
+
+      <div id="scDocuments" class="hidden">
+        <div id="cestovnyPrikaz" class="document-container"></div>
+        <div id="vyuctovanie" class="document-container"></div>
+      </div>
+    </div>
   </main>
 
   <script>
@@ -314,6 +436,24 @@
         signatureBlock: document.getElementById('signatureBlock'),
         signatureImg: document.getElementById('signatureImg'),
         fileName: document.getElementById('fileName'),
+        // View tabs
+        tabDochadzka: document.getElementById('tabDochadzka'),
+        tabSC: document.getElementById('tabSC'),
+        dochadzkaView: document.getElementById('dochadzkaView'),
+        scView: document.getElementById('scView'),
+        // SC view elements
+        tripNav: document.getElementById('tripNav'),
+        prevTrip: document.getElementById('prevTrip'),
+        nextTrip: document.getElementById('nextTrip'),
+        tripLabel: document.getElementById('tripLabel'),
+        tripList: document.getElementById('tripList'),
+        tripControls: document.getElementById('tripControls'),
+        tripStartTime: document.getElementById('tripStartTime'),
+        tripEndTime: document.getElementById('tripEndTime'),
+        tripKm: document.getElementById('tripKm'),
+        scDocuments: document.getElementById('scDocuments'),
+        cestovnyPrikaz: document.getElementById('cestovnyPrikaz'),
+        vyuctovanie: document.getElementById('vyuctovanie'),
       };
 
       const state = {
@@ -326,6 +466,8 @@
         saveTimeout: null,
         lastFileName: localStorage.getItem('lastFileName') || '',
         editMode: false,
+        currentView: 'dochadzka', // 'dochadzka' | 'sc'
+        selectedTripIndex: 0,
       };
 
       const DB_NAME = 'dochadzka-db';
@@ -342,6 +484,21 @@
           departure: '16:30',
         },
         signaturePng: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
+      };
+
+      const defaultScConfig = {
+        address: 'Adresa 123, 010 01 Mesto',
+        destination: 'Miesto konania',
+        purpose: 'Účel cesty',
+        vehicleType: 'osobné motorové vozidlo',
+        licensePlate: 'XX-000XX',
+        defaultKm: 370,
+        defaultStartTime: '04:30',
+        perDiem: {
+          rate5to12: 9.30,
+          rate12to18: 13.90,
+          rateOver18: 20.60,
+        },
       };
 
       function formatMonthKey(year, monthIndex) {
@@ -509,8 +666,154 @@
       function normalizeData(input) {
         const cfg = { ...defaultConfig, ...(input.config || {}) };
         cfg.defaultTimes = { ...defaultConfig.defaultTimes, ...(input.config?.defaultTimes || {}) };
+        const scCfg = { ...defaultScConfig, ...(input.scConfig || {}) };
+        scCfg.perDiem = { ...defaultScConfig.perDiem, ...(input.scConfig?.perDiem || {}) };
         const months = { ...(input.months || {}) };
-        return { ...input, config: cfg, months };
+        // Ensure each month has trips array
+        Object.keys(months).forEach(key => {
+          if (!months[key].trips) months[key].trips = [];
+        });
+        return { ...input, config: cfg, scConfig: scCfg, months };
+      }
+
+      // SC Functions
+      function findSCBlocks(monthData) {
+        const days = monthData.days || {};
+        const dayKeys = Object.keys(days)
+          .filter(key => days[key] === 'SC')
+          .sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+        if (dayKeys.length === 0) return [];
+        const blocks = [];
+        let startDay = dayKeys[0];
+        let endDay = dayKeys[0];
+        for (let i = 1; i < dayKeys.length; i++) {
+          const currentDay = parseInt(dayKeys[i], 10);
+          const previousDay = parseInt(dayKeys[i - 1], 10);
+          if (currentDay === previousDay + 1) {
+            endDay = dayKeys[i];
+          } else {
+            blocks.push({ startDay, endDay });
+            startDay = dayKeys[i];
+            endDay = dayKeys[i];
+          }
+        }
+        blocks.push({ startDay, endDay });
+        return blocks;
+      }
+
+      function syncTrips(monthData, monthKey, scConfig) {
+        const detectedBlocks = findSCBlocks(monthData);
+        const existingTrips = monthData.trips || [];
+        const updatedTrips = [...existingTrips];
+        for (const block of detectedBlocks) {
+          const blockId = `${block.startDay}-${block.endDay}-${monthKey}`;
+          const exists = existingTrips.some(trip => trip.id === blockId);
+          if (!exists) {
+            updatedTrips.push({
+              id: blockId,
+              startDay: block.startDay,
+              endDay: block.endDay,
+              confirmed: false,
+              startTime: scConfig.defaultStartTime,
+              endTime: '',
+              km: scConfig.defaultKm,
+            });
+          }
+        }
+        return updatedTrips;
+      }
+
+      function calculateHoursBetween(startTime, endTime) {
+        const [sh, sm] = startTime.split(':').map(Number);
+        const [eh, em] = endTime.split(':').map(Number);
+        const startMins = sh * 60 + sm;
+        const endMins = eh * 60 + em;
+        return (endMins - startMins) / 60;
+      }
+
+      function getPerDiem(hours, rates) {
+        if (hours < 5) return 0;
+        if (hours <= 12) return rates.rate5to12;
+        if (hours <= 18) return rates.rate12to18;
+        return rates.rateOver18;
+      }
+
+      function renderCestovnyPrikaz(trip, monthKey, config, scConfig) {
+        const [month, year] = monthKey.split('-');
+        const startDateStr = `${trip.startDay}.${month}.${year} ${trip.startTime}`;
+        const endDateStr = `${trip.endDay}.${month}.${year} ${trip.endTime || '??:??'}`;
+        const signatureDate = `01.${month}.${year}`;
+        return `
+          <div class="cp-title">CESTOVNÝ PRÍKAZ</div>
+          <div class="cp-section">
+            <div class="cp-row"><span class="cp-label">Zamestnávateľ:</span><span>${config.employerName}</span></div>
+            <div class="cp-row"><span class="cp-label">Adresa:</span><span>${scConfig.address}</span></div>
+          </div>
+          <div class="cp-section">
+            <div class="cp-row"><span class="cp-label">Zamestnanec:</span><span>${config.employeeName}</span></div>
+          </div>
+          <div class="cp-section">
+            <div class="cp-row"><span class="cp-label">Dátum a čas odchodu:</span><span>${startDateStr}</span></div>
+            <div class="cp-row"><span class="cp-label">Dátum a čas príchodu:</span><span>${endDateStr}</span></div>
+            <div class="cp-row"><span class="cp-label">Miesto konania:</span><span>${scConfig.destination}</span></div>
+            <div class="cp-row"><span class="cp-label">Účel cesty:</span><span>${scConfig.purpose}</span></div>
+          </div>
+          <div class="cp-section">
+            <div class="cp-row"><span class="cp-label">Dopravný prostriedok:</span><span>${scConfig.vehicleType}</span></div>
+            <div class="cp-row"><span class="cp-label">ŠPZ:</span><span>${scConfig.licensePlate}</span></div>
+          </div>
+          <div class="cp-signature">
+            <div class="cp-row"><span class="cp-label">Dátum:</span><span>${signatureDate}</span></div>
+            <div class="cp-row"><span class="cp-label">Podpis:</span><img src="${config.signaturePng}" alt="Podpis" /></div>
+          </div>
+        `;
+      }
+
+      function renderVyuctovanie(trip, monthKey, config, scConfig) {
+        const [month, year] = monthKey.split('-');
+        const startDay = parseInt(trip.startDay, 10);
+        const endDay = parseInt(trip.endDay, 10);
+        const isSingleDay = startDay === endDay;
+        const rates = scConfig.perDiem;
+        let tableRows = '';
+        let totalKm = 0;
+        let totalPerDiem = 0;
+        for (let d = startDay; d <= endDay; d++) {
+          const dayStr = String(d).padStart(2, '0');
+          const dateStr = `${dayStr}.${month}.${year}`;
+          let aus = '-', km = '-', timeFrom = '00:00', timeTo = '23:59';
+          if (isSingleDay) {
+            aus = 'AUS'; km = trip.km; timeFrom = trip.startTime; timeTo = trip.endTime || '23:59';
+          } else if (d === startDay) {
+            aus = 'AUS'; km = trip.km; timeFrom = trip.startTime; timeTo = '23:59';
+          } else if (d === endDay) {
+            aus = 'AUS'; km = trip.km; timeFrom = '00:00'; timeTo = trip.endTime || '23:59';
+          }
+          const hours = calculateHoursBetween(timeFrom, timeTo);
+          const perDiem = getPerDiem(hours, rates);
+          if (km !== '-') totalKm += km;
+          totalPerDiem += perDiem;
+          tableRows += `<tr><td>${dateStr}</td><td>${aus}</td><td>${km}</td><td>${timeFrom}</td><td>${timeTo}</td><td>${hours.toFixed(1)}</td><td>${perDiem.toFixed(2)} €</td></tr>`;
+        }
+        const lastDay = new Date(parseInt(year), parseInt(month), 0).getDate();
+        const sigDate = `${lastDay}.${month}.${year}`;
+        return `
+          <div class="vu-title">VYÚČTOVANIE PRACOVNEJ CESTY</div>
+          <div class="vu-header">
+            <p><strong>Zamestnanec:</strong> ${config.employeeName}</p>
+            <p><strong>Zamestnávateľ:</strong> ${config.employerName}</p>
+            <p><strong>Služobná cesta:</strong> ${trip.id}</p>
+          </div>
+          <table class="vu-table">
+            <thead><tr><th>Dátum</th><th>AUS</th><th>KM</th><th>Čas od</th><th>Čas do</th><th>Hodiny</th><th>Stravné</th></tr></thead>
+            <tbody>${tableRows}</tbody>
+            <tfoot><tr class="vu-totals"><td colspan="2"><strong>SPOLU</strong></td><td><strong>${totalKm}</strong></td><td colspan="3"></td><td><strong>${totalPerDiem.toFixed(2)} €</strong></td></tr></tfoot>
+          </table>
+          <div class="vu-signature">
+            <p><strong>Dátum:</strong> ${sigDate}</p>
+            <p><strong>Podpis:</strong> <img src="${config.signaturePng}" alt="Podpis" /></p>
+          </div>
+        `;
       }
 
       function createSampleData() {
@@ -798,6 +1101,59 @@
         input.click();
       }
 
+      function renderSCView() {
+        const monthData = state.data.months[state.selectedMonthKey];
+        // Sync trips with detected SC blocks
+        const updatedTrips = syncTrips(monthData, state.selectedMonthKey, state.data.scConfig);
+        if (JSON.stringify(updatedTrips) !== JSON.stringify(monthData.trips)) {
+          monthData.trips = updatedTrips;
+          scheduleSave();
+        }
+        const trips = monthData.trips || [];
+        const confirmedTrips = trips.filter(t => t.confirmed);
+
+        // Trip list
+        if (trips.length === 0) {
+          elements.tripList.innerHTML = '<div class="meta">Žiadne služobné cesty v tomto mesiaci.</div>';
+        } else {
+          elements.tripList.innerHTML = trips.map((trip, idx) => {
+            const startD = parseInt(trip.startDay, 10);
+            const endD = parseInt(trip.endDay, 10);
+            const days = endD - startD + 1;
+            const [month, year] = state.selectedMonthKey.split('-');
+            const dateRange = `${trip.startDay}.${month} - ${trip.endDay}.${month}.${year}`;
+            const statusClass = trip.confirmed ? 'trip-confirmed' : 'trip-unconfirmed';
+            const statusText = trip.confirmed ? '✓ potvrdené' : '';
+            const confirmBtn = trip.confirmed ? '' : `<button data-idx="${idx}" class="confirm-trip-btn">Potvrdiť</button>`;
+            const selectBtn = trip.confirmed ? `<button data-idx="${idx}" class="select-trip-btn ghost">Zobraziť</button>` : '';
+            return `<div class="trip-item ${statusClass}"><span>${dateRange} (${days} ${days === 1 ? 'deň' : 'dní'}) ${statusText}</span><span>${confirmBtn}${selectBtn}</span></div>`;
+          }).join('');
+        }
+
+        // Trip navigation and controls
+        if (confirmedTrips.length > 0) {
+          if (state.selectedTripIndex >= confirmedTrips.length) state.selectedTripIndex = 0;
+          const trip = confirmedTrips[state.selectedTripIndex];
+          elements.tripNav.classList.remove('hidden');
+          elements.tripLabel.textContent = `[${trip.id}]`;
+          elements.prevTrip.disabled = state.selectedTripIndex <= 0;
+          elements.nextTrip.disabled = state.selectedTripIndex >= confirmedTrips.length - 1;
+
+          elements.tripControls.classList.remove('hidden');
+          elements.tripStartTime.value = trip.startTime || '';
+          elements.tripEndTime.value = trip.endTime || '';
+          elements.tripKm.value = trip.km || '';
+
+          elements.scDocuments.classList.remove('hidden');
+          elements.cestovnyPrikaz.innerHTML = renderCestovnyPrikaz(trip, state.selectedMonthKey, state.data.config, state.data.scConfig);
+          elements.vyuctovanie.innerHTML = renderVyuctovanie(trip, state.selectedMonthKey, state.data.config, state.data.scConfig);
+        } else {
+          elements.tripNav.classList.add('hidden');
+          elements.tripControls.classList.add('hidden');
+          elements.scDocuments.classList.add('hidden');
+        }
+      }
+
       function render(focusAfterRender = false) {
         elements.unsupported.style.display = state.fsSupported ? 'none' : 'block';
         elements.insecure.classList.toggle('hidden', state.isSecure);
@@ -808,18 +1164,35 @@
         elements.fileName.textContent = state.lastFileName ? `Súbor: ${state.lastFileName}` : '';
 
         const hasData = Boolean(state.data && state.selectedMonthKey);
-        elements.editBtn.disabled = !hasData;
+
+        // View tabs
+        elements.tabDochadzka.classList.toggle('active', state.currentView === 'dochadzka');
+        elements.tabSC.classList.toggle('active', state.currentView === 'sc');
+        elements.dochadzkaView.classList.toggle('hidden', state.currentView !== 'dochadzka');
+        elements.scView.classList.toggle('hidden', state.currentView !== 'sc');
+
+        // Edit button only for dochadzka view
+        elements.editBtn.disabled = !hasData || state.currentView !== 'dochadzka';
         elements.editBtn.textContent = state.editMode ? 'Hotovo' : 'Upraviť';
         elements.editBtn.classList.toggle('editing', state.editMode);
         elements.signatureBtn.disabled = !hasData;
         elements.printBtn.disabled = !hasData;
-        elements.monthNav.classList.toggle('hidden', !hasData);
-        elements.summary.classList.toggle('hidden', !hasData);
-        elements.table.classList.toggle('hidden', !hasData);
-        elements.legend.classList.toggle('hidden', !hasData);
-        elements.signatureBlock.classList.toggle('hidden', !hasData);
+        elements.monthNav.classList.toggle('hidden', !hasData || state.currentView !== 'dochadzka');
+        elements.summary.classList.toggle('hidden', !hasData || state.currentView !== 'dochadzka');
+        elements.table.classList.toggle('hidden', !hasData || state.currentView !== 'dochadzka');
+        elements.legend.classList.toggle('hidden', !hasData || state.currentView !== 'dochadzka');
+        elements.signatureBlock.classList.toggle('hidden', !hasData || state.currentView !== 'dochadzka');
 
-        if (!hasData) return;
+        if (!hasData) {
+          elements.scView.classList.add('hidden');
+          return;
+        }
+
+        // Render SC view if active
+        if (state.currentView === 'sc') {
+          renderSCView();
+          return;
+        }
 
         const monthKeys = getSortedMonthKeys(state.data.months);
         if (!state.selectedMonthKey || !state.data.months[state.selectedMonthKey]) {
@@ -933,6 +1306,52 @@
         elements.prevMonth.addEventListener('click', () => changeMonth(-1));
         elements.nextMonth.addEventListener('click', () => changeMonth(1));
         document.addEventListener('keydown', handleKeydown);
+
+        // View tabs
+        elements.tabDochadzka.addEventListener('click', () => { state.currentView = 'dochadzka'; render(false); });
+        elements.tabSC.addEventListener('click', () => { state.currentView = 'sc'; render(false); });
+
+        // Trip navigation
+        elements.prevTrip.addEventListener('click', () => { state.selectedTripIndex--; render(false); });
+        elements.nextTrip.addEventListener('click', () => { state.selectedTripIndex++; render(false); });
+
+        // Trip list click handlers (confirm/select)
+        elements.tripList.addEventListener('click', (e) => {
+          const btn = e.target.closest('button');
+          if (!btn) return;
+          const idx = parseInt(btn.dataset.idx, 10);
+          const trips = state.data.months[state.selectedMonthKey].trips;
+          if (btn.classList.contains('confirm-trip-btn')) {
+            trips[idx].confirmed = true;
+            state.selectedTripIndex = trips.filter(t => t.confirmed).length - 1;
+            scheduleSave();
+            render(false);
+          } else if (btn.classList.contains('select-trip-btn')) {
+            const confirmedTrips = trips.filter(t => t.confirmed);
+            const tripId = trips[idx].id;
+            state.selectedTripIndex = confirmedTrips.findIndex(t => t.id === tripId);
+            render(false);
+          }
+        });
+
+        // Trip time/km input handlers
+        const updateTrip = () => {
+          const trips = state.data.months[state.selectedMonthKey].trips;
+          const confirmedTrips = trips.filter(t => t.confirmed);
+          if (confirmedTrips[state.selectedTripIndex]) {
+            const trip = confirmedTrips[state.selectedTripIndex];
+            trip.startTime = elements.tripStartTime.value;
+            trip.endTime = elements.tripEndTime.value;
+            trip.km = parseInt(elements.tripKm.value, 10) || 0;
+            scheduleSave();
+            // Re-render documents
+            elements.cestovnyPrikaz.innerHTML = renderCestovnyPrikaz(trip, state.selectedMonthKey, state.data.config, state.data.scConfig);
+            elements.vyuctovanie.innerHTML = renderVyuctovanie(trip, state.selectedMonthKey, state.data.config, state.data.scConfig);
+          }
+        };
+        elements.tripStartTime.addEventListener('change', updateTrip);
+        elements.tripEndTime.addEventListener('change', updateTrip);
+        elements.tripKm.addEventListener('change', updateTrip);
 
         if (!state.fsSupported) {
           elements.unsupported.style.display = 'block';

@@ -1,8 +1,30 @@
-# Source Excel file (reference only)
-dochadzka.xlsx
+# Dependencies
+node_modules/
+package.json
+package-lock.json
 
+# Test artifacts
+test-results/
+test-sc.mjs
+playwright-report/
+
+# Reference files (not part of app)
+dochadzka.xlsx
 sample.png
+docs/plans/sc.md
+docs/plans/*.xlsm
 
 # OS files
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Claude Code
+.claude/
+tmpclaude-*
