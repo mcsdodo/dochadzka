@@ -77,6 +77,8 @@
 
     .primary { background: var(--accent); color: #fff; border-color: var(--accent); }
     .ghost { background: #f3f6ff; border-color: #dbe4ff; }
+    .danger { background: #fee2e2; border-color: #fca5a5; color: #dc2626; }
+    .danger:hover { background: #fecaca; border-color: #f87171; }
 
     #editBtn {
       background: #16a34a;
@@ -1419,7 +1421,8 @@
             const statusText = trip.confirmed ? '✓ potvrdené' : '';
             const confirmBtn = trip.confirmed ? '' : `<button data-idx="${idx}" class="confirm-trip-btn">Potvrdiť</button>`;
             const selectBtn = trip.confirmed ? `<button data-idx="${idx}" class="select-trip-btn ghost">Zobraziť</button>` : '';
-            return `<div class="trip-item ${statusClass}"><span>${dateRange} (${days} ${days === 1 ? 'deň' : 'dní'}) ${statusText}</span><span>${confirmBtn}${selectBtn}</span></div>`;
+            const deleteBtn = `<button data-idx="${idx}" class="delete-trip-btn danger">Vymazať</button>`;
+            return `<div class="trip-item ${statusClass}"><span>${dateRange} (${days} ${days === 1 ? 'deň' : 'dní'}) ${statusText}</span><span>${confirmBtn}${selectBtn} ${deleteBtn}</span></div>`;
           }).join('');
         }
 
@@ -1643,6 +1646,15 @@
             const tripId = trips[idx].id;
             state.selectedTripIndex = confirmedTrips.findIndex(t => t.id === tripId);
             render(false);
+          } else if (btn.classList.contains('delete-trip-btn')) {
+            if (confirm('Naozaj chcete vymazať túto služobnú cestu?')) {
+              trips.splice(idx, 1);
+              if (state.selectedTripIndex >= trips.filter(t => t.confirmed).length) {
+                state.selectedTripIndex = Math.max(0, trips.filter(t => t.confirmed).length - 1);
+              }
+              scheduleSave();
+              render(false);
+            }
           }
         });
 
