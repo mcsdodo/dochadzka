@@ -996,6 +996,48 @@
     }
   }
 
+  // URL hash routing (format: #view/month/tripId)
+  function parseHash() {
+    const hash = window.location.hash.slice(1);
+    const parts = hash.split('/');
+    return {
+      view: parts[0] === 'sluzobne-cesty' ? 'sc' : 'dochadzka',
+      month: parts[1] || null,
+      tripId: parts[2] || null
+    };
+  }
+  function buildHash(view, month, tripId) {
+    const viewPart = view === 'sc' ? 'sluzobne-cesty' : 'dochadzka';
+    let hash = `#${viewPart}`;
+    if (month) hash += `/${month}`;
+    if (tripId && view === 'sc') hash += `/${tripId}`;
+    return hash;
+  }
+  function setStateFromHash() {
+    const { view, month, tripId } = parseHash();
+    state.currentView = view;
+    if (month && state.data?.months?.[month]) {
+      state.selectedMonthKey = month;
+    }
+    if (tripId && view === 'sc' && state.data?.months?.[state.selectedMonthKey]) {
+      const trips = state.data.months[state.selectedMonthKey].trips || [];
+      const confirmedTrips = trips.filter(t => t.confirmed);
+      const idx = confirmedTrips.findIndex(t => t.id === tripId);
+      if (idx >= 0) state.selectedTripIndex = idx;
+    }
+  }
+  function updateHash() {
+    if (!state.data) return;
+    const trips = state.data.months?.[state.selectedMonthKey]?.trips || [];
+    const confirmedTrips = trips.filter(t => t.confirmed);
+    const selectedTrip = confirmedTrips[state.selectedTripIndex];
+    const tripId = state.currentView === 'sc' && selectedTrip ? selectedTrip.id : null;
+    const newHash = buildHash(state.currentView, state.selectedMonthKey, tripId);
+    if (window.location.hash !== newHash) {
+      history.replaceState(null, '', newHash);
+    }
+  }
+
   function render(focusAfterRender = false) {
     elements.unsupported.style.display = state.fsSupported ? 'none' : 'block';
     elements.insecure.classList.toggle('hidden', state.isSecure);
@@ -1047,6 +1089,7 @@
     // Render SC view if active
     if (state.currentView === 'sc') {
       renderSCView();
+      updateHash();
       return;
     }
 
@@ -1113,6 +1156,7 @@
       const activeCell = elements.tableBody.querySelector(`.hours-cell[data-index="${state.selectedDayIndex}"]`);
       if (activeCell) activeCell.focus({ preventScroll: false });
     }
+    updateHash();
   }
 
   function loadTestData() {
@@ -1150,27 +1194,10 @@
     document.addEventListener('keydown', handleKeydown);
 
     // View tabs with hash routing
-    function setViewFromHash() {
-      const hash = window.location.hash;
-      if (hash === '#sluzobne-cesty') {
-        state.currentView = 'sc';
-      } else {
-        state.currentView = 'dochadzka';
-      }
-    }
-    function navigateToView(view) {
-      const hash = view === 'sc' ? '#sluzobne-cesty' : '#dochadzka';
-      if (window.location.hash !== hash) {
-        window.location.hash = hash;
-      } else {
-        state.currentView = view;
-        render(false);
-      }
-    }
-    elements.tabDochadzka.addEventListener('click', () => navigateToView('dochadzka'));
-    elements.tabSC.addEventListener('click', () => navigateToView('sc'));
-    window.addEventListener('hashchange', () => { setViewFromHash(); render(false); });
-    setViewFromHash(); // Set initial view from hash
+    elements.tabDochadzka.addEventListener('click', () => { state.currentView = 'dochadzka'; updateHash(); render(false); });
+    elements.tabSC.addEventListener('click', () => { state.currentView = 'sc'; updateHash(); render(false); });
+    window.addEventListener('hashchange', () => { setStateFromHash(); render(false); });
+    setStateFromHash(); // Set initial state from hash
 
     // Trip navigation
 
