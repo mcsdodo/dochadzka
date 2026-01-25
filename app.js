@@ -1026,7 +1026,7 @@
     elements.editBtn.classList.toggle('editing', state.editMode);
     elements.signatureBtn.disabled = !hasData;
     elements.printBtn.disabled = !hasData;
-    elements.monthNav.classList.toggle('hidden', !hasData || state.currentView !== 'dochadzka');
+    elements.monthNav.classList.toggle('hidden', !hasData);
     elements.summary.classList.toggle('hidden', !hasData || state.currentView !== 'dochadzka');
     elements.table.classList.toggle('hidden', !hasData || state.currentView !== 'dochadzka');
     elements.legend.classList.toggle('hidden', !hasData || state.currentView !== 'dochadzka');
