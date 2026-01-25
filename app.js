@@ -81,6 +81,7 @@
     licensePlate: 'XX-000XX',
     defaultKm: 370,
     defaultStartTime: '04:30',
+    defaultEndTime: '20:00',
     perDiem: {
       rate5to12: 9.30,
       rate12to18: 13.90,
@@ -326,7 +327,7 @@
             endDay,
             confirmed: false,
             startTime: scConfig.defaultStartTime,
-            endTime: '',
+            endTime: scConfig.defaultEndTime,
             km: scConfig.defaultKm,
           });
           if (i < uncoveredDays.length) {
