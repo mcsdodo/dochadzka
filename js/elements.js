@@ -19,7 +19,7 @@ export const elements = {
   metaEmployer: document.getElementById('metaEmployer'),
   metaEmployee: document.getElementById('metaEmployee'),
   table: document.getElementById('attendanceTable'),
-  tableBody: document.getElementById('attendanceBody'),
+  tableBody: document.getElementById('tableBody'),
   legend: document.getElementById('legend'),
   fileName: document.getElementById('fileName'),
   dochadzkaView: document.getElementById('dochadzkaView'),
