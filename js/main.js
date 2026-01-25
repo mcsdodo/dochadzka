@@ -9,7 +9,7 @@ import {
 import { setStateFromHash, updateHash } from './router.js';
 import {
   setRenderFunction, createSampleFile, openFile, reconnectFile,
-  loadStoredHandle, scheduleSave, normalizeData, verifyPermission
+  loadStoredHandle, loadFromHandle, scheduleSave, normalizeData
 } from './storage.js';
 import { syncTrips } from './trips.js';
 import { renderCestovnyPrikaz, renderVyuctovanie } from './documents.js';
@@ -422,7 +422,7 @@ function init() {
   (async () => {
     const stored = await loadStoredHandle();
     if (stored) {
-      state.fileHandle = stored;
+      await loadFromHandle(stored);
     }
   })();
 }
