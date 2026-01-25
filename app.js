@@ -293,14 +293,11 @@
   function syncTrips(monthData, monthKey, scConfig) {
     const detectedBlocks = findSCBlocks(monthData);
     const existingTrips = monthData.trips || [];
-    const deletedTripIds = monthData.deletedTripIds || [];
-    // Filter out deleted trips from existing trips
-    const updatedTrips = existingTrips.filter(trip => !deletedTripIds.includes(trip.id));
+    const updatedTrips = [...existingTrips];
     for (const block of detectedBlocks) {
       const blockId = `${block.startDay}-${block.endDay}-${monthKey}`;
       const exists = updatedTrips.some(trip => trip.id === blockId);
-      const wasDeleted = deletedTripIds.includes(blockId);
-      if (!exists && !wasDeleted) {
+      if (!exists) {
         updatedTrips.push({
           id: blockId,
           startDay: block.startDay,
@@ -1170,10 +1167,6 @@
         render(false);
       } else if (btn.classList.contains('delete-trip-btn')) {
         if (confirm('Naozaj chcete vymazať túto služobnú cestu?')) {
-          const deletedTrip = trips[idx];
-          const monthData = state.data.months[state.selectedMonthKey];
-          if (!monthData.deletedTripIds) monthData.deletedTripIds = [];
-          monthData.deletedTripIds.push(deletedTrip.id);
           trips.splice(idx, 1);
           if (state.selectedTripIndex >= trips.filter(t => t.confirmed).length) {
             state.selectedTripIndex = Math.max(0, trips.filter(t => t.confirmed).length - 1);

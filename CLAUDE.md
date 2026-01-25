@@ -21,7 +21,7 @@ Then open `http://localhost:8000`
 
 ### Data Storage
 - JSON file selected by user via File System Access API
-- Structure: `{ config, scConfig, months: { "MM-YYYY": { days, trips, deletedTripIds } } }`
+- Structure: `{ config, scConfig, months: { "MM-YYYY": { days, trips } } }`
 
 ### Views
 1. **Dochádzka** - Monthly attendance calendar with day types (work hours, vacation, sick leave, etc.)
@@ -30,7 +30,7 @@ Then open `http://localhost:8000`
 ### Key Functions
 - `generateMonth()` - Creates month structure with days
 - `findSCBlocks()` - Detects consecutive SC days in calendar
-- `syncTrips()` - Syncs trips with detected SC blocks, respects deletedTripIds
+- `syncTrips()` - Syncs trips with detected SC blocks
 - `renderCestovnyPrikaz()` / `renderVyuctovanie()` - Render travel documents
 
 ### Day Types
@@ -45,5 +45,5 @@ Then open `http://localhost:8000`
 ## Notes
 
 - Business trips are auto-created when SC days are marked in calendar
-- Deleted trips are tracked in `deletedTripIds` to prevent re-creation
+- Deleted trips will regenerate if SC days still exist in calendar
 - Documents styled to match Slovak official formats
