@@ -1213,7 +1213,8 @@
 
     // Trip time/km input handlers
     const updateTrip = () => {
-      const trips = state.data.months[state.selectedMonthKey].trips;
+      const monthData = state.data.months[state.selectedMonthKey];
+      const trips = monthData.trips;
       const confirmedTrips = trips.filter(t => t.confirmed);
       if (confirmedTrips[state.selectedTripIndex]) {
         const trip = confirmedTrips[state.selectedTripIndex];
@@ -1222,10 +1223,10 @@
         trip.startTime = elements.tripStartTime.value;
         trip.endTime = elements.tripEndTime.value;
         trip.km = parseInt(elements.tripKm.value, 10) || 0;
+        // Sync trips to create new ones for uncovered SC days
+        monthData.trips = syncTrips(monthData, state.selectedMonthKey, state.data.scConfig);
         scheduleSave();
-        // Re-render documents
-        elements.cestovnyPrikaz.innerHTML = renderCestovnyPrikaz(trip, state.selectedMonthKey, state.data.config, state.data.scConfig);
-        elements.vyuctovanie.innerHTML = renderVyuctovanie(trip, state.selectedMonthKey, state.data.config, state.data.scConfig);
+        renderSC();
       }
     };
     elements.tripStartDay.addEventListener('change', updateTrip);
