@@ -1037,17 +1037,11 @@
       return;
     }
 
-    // Render SC view if active
-    if (state.currentView === 'sc') {
-      renderSCView();
-      return;
-    }
-
+    // Update month navigation (shared between views)
     const monthKeys = getSortedMonthKeys(state.data.months);
     if (!state.selectedMonthKey || !state.data.months[state.selectedMonthKey]) {
       state.selectedMonthKey = monthKeys[0];
     }
-
     const currentIndex = monthKeys.indexOf(state.selectedMonthKey);
     const prevLabel = monthKeys[currentIndex - 1] || '–';
     const nextLabel = monthKeys[currentIndex + 1] || '–';
@@ -1056,6 +1050,12 @@
     elements.prevMonth.disabled = currentIndex <= 0;
     elements.nextMonth.disabled = currentIndex >= monthKeys.length - 1;
     elements.monthLabel.textContent = `[${state.selectedMonthKey}]`;
+
+    // Render SC view if active
+    if (state.currentView === 'sc') {
+      renderSCView();
+      return;
+    }
 
     const currentMonth = state.data.months[state.selectedMonthKey];
     const dayKeys = getDayKeys(state.selectedMonthKey);
@@ -1226,7 +1226,7 @@
         // Sync trips to create new ones for uncovered SC days
         monthData.trips = syncTrips(monthData, state.selectedMonthKey, state.data.scConfig);
         scheduleSave();
-        renderSC();
+        renderSCView();
       }
     };
     elements.tripStartDay.addEventListener('change', updateTrip);
