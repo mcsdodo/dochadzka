@@ -30,10 +30,6 @@
     dochadzkaView: document.getElementById('dochadzkaView'),
     scView: document.getElementById('scView'),
     // SC view elements
-    tripNav: document.getElementById('tripNav'),
-    prevTrip: document.getElementById('prevTrip'),
-    nextTrip: document.getElementById('nextTrip'),
-    tripLabel: document.getElementById('tripLabel'),
     tripList: document.getElementById('tripList'),
     tripControls: document.getElementById('tripControls'),
     tripStartDay: document.getElementById('tripStartDay'),
@@ -962,29 +958,27 @@
     if (trips.length === 0) {
       elements.tripList.innerHTML = '<div class="meta">Žiadne služobné cesty v tomto mesiaci.</div>';
     } else {
+      const selectedTrip = confirmedTrips[state.selectedTripIndex];
       elements.tripList.innerHTML = trips.map((trip, idx) => {
         const startD = parseInt(trip.startDay, 10);
         const endD = parseInt(trip.endDay, 10);
         const days = endD - startD + 1;
         const [month, year] = state.selectedMonthKey.split('-');
         const dateRange = `${trip.startDay}.${month} - ${trip.endDay}.${month}.${year}`;
+        const isSelected = selectedTrip && trip.id === selectedTrip.id;
         const statusClass = trip.confirmed ? 'trip-confirmed' : 'trip-unconfirmed';
-        const statusText = trip.confirmed ? '✓ potvrdené' : '';
+        const selectedClass = isSelected ? 'trip-selected' : '';
+        const statusText = trip.confirmed ? '✓' : '';
         const confirmBtn = trip.confirmed ? '' : `<button data-idx="${idx}" class="confirm-trip-btn">Potvrdiť</button>`;
-        const selectBtn = trip.confirmed ? `<button data-idx="${idx}" class="select-trip-btn ghost">Zobraziť</button>` : '';
         const deleteBtn = `<button data-idx="${idx}" class="delete-trip-btn danger">Vymazať</button>`;
-        return `<div class="trip-item ${statusClass}"><span>${dateRange} (${days} ${days === 1 ? 'deň' : 'dní'}) ${statusText}</span><span>${confirmBtn}${selectBtn} ${deleteBtn}</span></div>`;
+        return `<div class="trip-item ${statusClass} ${selectedClass}"><span>${dateRange} (${days} ${days === 1 ? 'deň' : 'dní'}) ${statusText}</span><span>${confirmBtn} ${deleteBtn}</span></div>`;
       }).join('');
     }
 
-    // Trip navigation and controls
+    // Trip controls and documents for selected trip
     if (confirmedTrips.length > 0) {
       if (state.selectedTripIndex >= confirmedTrips.length) state.selectedTripIndex = 0;
       const trip = confirmedTrips[state.selectedTripIndex];
-      elements.tripNav.classList.remove('hidden');
-      elements.tripLabel.textContent = `[${trip.id}]`;
-      elements.prevTrip.disabled = state.selectedTripIndex <= 0;
-      elements.nextTrip.disabled = state.selectedTripIndex >= confirmedTrips.length - 1;
 
       elements.tripControls.classList.remove('hidden');
       elements.tripStartDay.value = trip.startDay || '';
@@ -997,7 +991,6 @@
       elements.cestovnyPrikaz.innerHTML = renderCestovnyPrikaz(trip, state.selectedMonthKey, state.data.config, state.data.scConfig);
       elements.vyuctovanie.innerHTML = renderVyuctovanie(trip, state.selectedMonthKey, state.data.config, state.data.scConfig);
     } else {
-      elements.tripNav.classList.add('hidden');
       elements.tripControls.classList.add('hidden');
       elements.scDocuments.classList.add('hidden');
     }
@@ -1180,34 +1173,39 @@
     setViewFromHash(); // Set initial view from hash
 
     // Trip navigation
-    elements.prevTrip.addEventListener('click', () => { state.selectedTripIndex--; render(false); });
-    elements.nextTrip.addEventListener('click', () => { state.selectedTripIndex++; render(false); });
 
-    // Trip list click handlers (confirm/select)
+    // Trip list click handlers (confirm/select/delete)
     elements.tripList.addEventListener('click', (e) => {
-      const btn = e.target.closest('button');
-      if (!btn) return;
-      const idx = parseInt(btn.dataset.idx, 10);
       const trips = state.data.months[state.selectedMonthKey].trips;
-      if (btn.classList.contains('confirm-trip-btn')) {
-        trips[idx].confirmed = true;
-        state.selectedTripIndex = trips.filter(t => t.confirmed).length - 1;
-        scheduleSave();
-        render(false);
-      } else if (btn.classList.contains('select-trip-btn')) {
-        const confirmedTrips = trips.filter(t => t.confirmed);
-        const tripId = trips[idx].id;
-        state.selectedTripIndex = confirmedTrips.findIndex(t => t.id === tripId);
-        render(false);
-      } else if (btn.classList.contains('delete-trip-btn')) {
-        if (confirm('Naozaj chcete vymazať túto služobnú cestu?')) {
-          trips.splice(idx, 1);
-          if (state.selectedTripIndex >= trips.filter(t => t.confirmed).length) {
-            state.selectedTripIndex = Math.max(0, trips.filter(t => t.confirmed).length - 1);
-          }
+      const btn = e.target.closest('button');
+      if (btn) {
+        const idx = parseInt(btn.dataset.idx, 10);
+        if (btn.classList.contains('confirm-trip-btn')) {
+          trips[idx].confirmed = true;
+          state.selectedTripIndex = trips.filter(t => t.confirmed).length - 1;
           scheduleSave();
           render(false);
+        } else if (btn.classList.contains('delete-trip-btn')) {
+          if (confirm('Naozaj chcete vymazať túto služobnú cestu?')) {
+            trips.splice(idx, 1);
+            if (state.selectedTripIndex >= trips.filter(t => t.confirmed).length) {
+              state.selectedTripIndex = Math.max(0, trips.filter(t => t.confirmed).length - 1);
+            }
+            scheduleSave();
+            render(false);
+          }
         }
+        return;
+      }
+      // Click on trip item itself to select
+      const tripItem = e.target.closest('.trip-item');
+      if (tripItem && tripItem.classList.contains('trip-confirmed')) {
+        const allItems = [...elements.tripList.querySelectorAll('.trip-item')];
+        const idx = allItems.indexOf(tripItem);
+        const tripId = trips[idx].id;
+        const confirmedTrips = trips.filter(t => t.confirmed);
+        state.selectedTripIndex = confirmedTrips.findIndex(t => t.id === tripId);
+        render(false);
       }
     });
 

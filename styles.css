@@ -199,8 +199,10 @@ tbody tr:last-child td { border-bottom: 1px solid var(--border); }
   justify-content: space-between;
   align-items: center;
 }
-.trip-confirmed { border-left: 4px solid #16a34a; }
+.trip-confirmed { border-left: 4px solid #16a34a; cursor: pointer; }
+.trip-confirmed:hover { background: #f0fdf4; }
 .trip-unconfirmed { border-left: 4px solid #f59e0b; }
+.trip-selected { background: #dcfce7; border-color: #16a34a; }
 .trip-controls {
   display: flex;
   gap: 12px;
