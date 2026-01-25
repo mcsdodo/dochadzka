@@ -36,6 +36,8 @@
     tripLabel: document.getElementById('tripLabel'),
     tripList: document.getElementById('tripList'),
     tripControls: document.getElementById('tripControls'),
+    tripStartDay: document.getElementById('tripStartDay'),
+    tripEndDay: document.getElementById('tripEndDay'),
     tripStartTime: document.getElementById('tripStartTime'),
     tripEndTime: document.getElementById('tripEndTime'),
     tripKm: document.getElementById('tripKm'),
@@ -294,21 +296,51 @@
     const detectedBlocks = findSCBlocks(monthData);
     const existingTrips = monthData.trips || [];
     const updatedTrips = [...existingTrips];
+
+    // Collect all SC days
+    const scDays = new Set();
     for (const block of detectedBlocks) {
-      const blockId = `${block.startDay}-${block.endDay}-${monthKey}`;
-      const exists = updatedTrips.some(trip => trip.id === blockId);
-      if (!exists) {
-        updatedTrips.push({
-          id: blockId,
-          startDay: block.startDay,
-          endDay: block.endDay,
-          confirmed: false,
-          startTime: scConfig.defaultStartTime,
-          endTime: '',
-          km: scConfig.defaultKm,
-        });
+      const start = parseInt(block.startDay, 10);
+      const end = parseInt(block.endDay, 10);
+      for (let d = start; d <= end; d++) scDays.add(d);
+    }
+
+    // Find days covered by existing trips
+    const coveredDays = new Set();
+    for (const trip of existingTrips) {
+      const start = parseInt(trip.startDay, 10);
+      const end = parseInt(trip.endDay, 10);
+      for (let d = start; d <= end; d++) coveredDays.add(d);
+    }
+
+    // Find uncovered SC days and group into contiguous blocks
+    const uncoveredDays = [...scDays].filter(d => !coveredDays.has(d)).sort((a, b) => a - b);
+    if (uncoveredDays.length > 0) {
+      let blockStart = uncoveredDays[0];
+      let blockEnd = uncoveredDays[0];
+      for (let i = 1; i <= uncoveredDays.length; i++) {
+        if (i < uncoveredDays.length && uncoveredDays[i] === blockEnd + 1) {
+          blockEnd = uncoveredDays[i];
+        } else {
+          const startDay = String(blockStart).padStart(2, '0');
+          const endDay = String(blockEnd).padStart(2, '0');
+          updatedTrips.push({
+            id: `${startDay}-${endDay}-${monthKey}`,
+            startDay,
+            endDay,
+            confirmed: false,
+            startTime: scConfig.defaultStartTime,
+            endTime: '',
+            km: scConfig.defaultKm,
+          });
+          if (i < uncoveredDays.length) {
+            blockStart = uncoveredDays[i];
+            blockEnd = uncoveredDays[i];
+          }
+        }
       }
     }
+
     return updatedTrips;
   }
 
@@ -955,6 +987,8 @@
       elements.nextTrip.disabled = state.selectedTripIndex >= confirmedTrips.length - 1;
 
       elements.tripControls.classList.remove('hidden');
+      elements.tripStartDay.value = trip.startDay || '';
+      elements.tripEndDay.value = trip.endDay || '';
       elements.tripStartTime.value = trip.startTime || '';
       elements.tripEndTime.value = trip.endTime || '';
       elements.tripKm.value = trip.km || '';
@@ -1183,6 +1217,8 @@
       const confirmedTrips = trips.filter(t => t.confirmed);
       if (confirmedTrips[state.selectedTripIndex]) {
         const trip = confirmedTrips[state.selectedTripIndex];
+        trip.startDay = String(parseInt(elements.tripStartDay.value, 10) || 1).padStart(2, '0');
+        trip.endDay = String(parseInt(elements.tripEndDay.value, 10) || 1).padStart(2, '0');
         trip.startTime = elements.tripStartTime.value;
         trip.endTime = elements.tripEndTime.value;
         trip.km = parseInt(elements.tripKm.value, 10) || 0;
@@ -1192,6 +1228,8 @@
         elements.vyuctovanie.innerHTML = renderVyuctovanie(trip, state.selectedMonthKey, state.data.config, state.data.scConfig);
       }
     };
+    elements.tripStartDay.addEventListener('change', updateTrip);
+    elements.tripEndDay.addEventListener('change', updateTrip);
     elements.tripStartTime.addEventListener('change', updateTrip);
     elements.tripEndTime.addEventListener('change', updateTrip);
     elements.tripKm.addEventListener('change', updateTrip);
