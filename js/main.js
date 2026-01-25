@@ -290,19 +290,6 @@ function render(focusAfterRender = false) {
     });
   };
 
-  elements.tableBody.querySelectorAll('.hours-cell').forEach((cell) => {
-    const idx = Number(cell.dataset.index);
-    cell.addEventListener('focus', () => {
-      state.selectedDayIndex = idx;
-      highlightSelection();
-    });
-    cell.addEventListener('click', () => {
-      state.selectedDayIndex = idx;
-      cell.focus();
-      highlightSelection();
-    });
-  });
-
   highlightSelection();
   if (focusAfterRender) {
     const activeCell = elements.tableBody.querySelector(`.hours-cell[data-index="${state.selectedDayIndex}"]`);
@@ -356,6 +343,7 @@ function init() {
 
   // Trip list click handlers
   elements.tripList.addEventListener('click', (e) => {
+    if (!state.data?.months?.[state.selectedMonthKey]) return;
     const trips = state.data.months[state.selectedMonthKey].trips;
     const btn = e.target.closest('button');
     if (btn) {
@@ -411,6 +399,27 @@ function init() {
   elements.tripStartTime.addEventListener('change', updateTrip);
   elements.tripEndTime.addEventListener('change', updateTrip);
   elements.tripKm.addEventListener('change', updateTrip);
+
+  // Table cell click/focus handlers (event delegation to avoid memory leak)
+  elements.tableBody.addEventListener('click', (e) => {
+    const cell = e.target.closest('.hours-cell');
+    if (!cell) return;
+    const idx = Number(cell.dataset.index);
+    state.selectedDayIndex = idx;
+    cell.focus();
+    elements.tableBody.querySelectorAll('.hours-cell').forEach((c, i) => {
+      c.classList.toggle('selected', state.editMode && i === state.selectedDayIndex);
+    });
+  });
+  elements.tableBody.addEventListener('focusin', (e) => {
+    const cell = e.target.closest('.hours-cell');
+    if (!cell) return;
+    const idx = Number(cell.dataset.index);
+    state.selectedDayIndex = idx;
+    elements.tableBody.querySelectorAll('.hours-cell').forEach((c, i) => {
+      c.classList.toggle('selected', state.editMode && i === state.selectedDayIndex);
+    });
+  });
 
   if (!state.fsSupported) {
     elements.unsupported.style.display = 'block';

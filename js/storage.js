@@ -129,7 +129,7 @@ export function createSampleData() {
   if (firstDays[0]) months[monthKey].days[firstDays[0]] = '0';
   if (firstDays[1]) months[monthKey].days[firstDays[1]] = 'D';
   if (firstDays[2]) months[monthKey].days[firstDays[2]] = '8';
-  return { config: { ...defaultConfig }, months };
+  return { config: { ...defaultConfig }, scConfig: { ...defaultScConfig }, months };
 }
 
 export async function createSampleFile() {
