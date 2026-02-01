@@ -20,6 +20,8 @@ export const elements = {
   metaEmployee: document.getElementById('metaEmployee'),
   table: document.getElementById('attendanceTable'),
   tableBody: document.getElementById('tableBody'),
+  totalValue: document.getElementById('totalValue'),
+  daySummary: document.getElementById('daySummary'),
   legend: document.getElementById('legend'),
   fileName: document.getElementById('fileName'),
   dochadzkaView: document.getElementById('dochadzkaView'),

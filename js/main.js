@@ -47,7 +47,7 @@ function getTimesForValue(value) {
   const defaults = state.data?.config?.defaultTimes || defaultConfig.defaultTimes;
   if (value === '8') return { arrival: defaults.arrival, breakStart: defaults.breakStart, breakEnd: defaults.breakEnd, departure: defaults.departure, hours: '8' };
   if (value === '0') return { arrival: '-', breakStart: '-', breakEnd: '-', departure: '-', hours: '0' };
-  if (value === 'SC') return { arrival: '-', breakStart: '-', breakEnd: '-', departure: '-', hours: 'SC' };
+  if (value === 'SC') return { arrival: defaults.arrival, breakStart: defaults.breakStart, breakEnd: defaults.breakEnd, departure: defaults.departure, hours: 'SC' };
   return { arrival: '-', breakStart: '-', breakEnd: '-', departure: '-', hours: value };
 }
 
@@ -220,6 +220,7 @@ function render(focusAfterRender = false) {
   elements.summary.classList.toggle('hidden', !hasData || state.currentView !== 'dochadzka');
   elements.table.classList.toggle('hidden', !hasData || state.currentView !== 'dochadzka');
   elements.legend.classList.toggle('hidden', !hasData || state.currentView !== 'dochadzka');
+  elements.daySummary.classList.toggle('hidden', !hasData || state.currentView !== 'dochadzka');
   elements.signatureBlock.classList.toggle('hidden', !hasData || state.currentView !== 'dochadzka');
 
   if (!hasData) {
@@ -275,7 +276,32 @@ function render(focusAfterRender = false) {
         <td>${times.departure}</td>
         <td class="${cellClass}" tabindex="${state.editMode ? '0' : '-1'}" data-index="${idx}">${times.hours}</td>
       </tr>`;
-  }).join('') + `<tr class="total-row"><td colspan="5">Spolu</td><td>${totalHours}</td></tr>`;
+  }).join('');
+
+  elements.totalValue.textContent = totalHours;
+
+  // Calculate day type counts
+  const counts = {};
+  dayKeys.forEach((dayKey) => {
+    const value = currentMonth.days[dayKey] ?? '0';
+    counts[value] = (counts[value] || 0) + 1;
+  });
+
+  // Render day summary
+  const labels = { '8': 'Práca', 'D': 'Dovolenka', 'SC': 'Služobná cesta', 'PN': 'PN', 'O': 'OČR', 'IN': 'Iná neprítomnosť', 'S': 'Sviatok' };
+  const order = ['8', 'SC', 'D', 'PN', 'O', 'IN', 'S'];
+  const summaryParts = order
+    .filter(key => counts[key])
+    .map(key => `${labels[key] || key}: ${counts[key]}`);
+
+  // Add any custom hour values not in order (exclude 0)
+  Object.keys(counts).forEach(key => {
+    if (!order.includes(key) && key !== '0' && counts[key]) {
+      summaryParts.push(`${key}h: ${counts[key]}`);
+    }
+  });
+
+  elements.daySummary.textContent = summaryParts.join(' | ');
 
   if (state.data.config.signaturePng) {
     elements.signatureImg.src = state.data.config.signaturePng;
