@@ -136,7 +136,7 @@ export function renderVacationRequest(vacation, monthKey, config, workingDays) {
               <td class="vacation-td-value"></td>
             </tr>
             <tr>
-              <td colspan="3" class="vacation-td-used">Z tejto dovolenky sa skutočne čerpalo <span class="vacation-dots-inline"></span> pracovných dní.</td>
+              <td colspan="3" class="vacation-td-used">Z tejto dovolenky sa skutočne čerpalo ${workingDays} pracovných dní.</td>
               <td class="vacation-td-value"></td>
             </tr>
             <tr>
