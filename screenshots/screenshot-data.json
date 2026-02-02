@@ -1,0 +1,87 @@
+{
+  "config": {
+    "employeeName": "Jozef Mrkvička",
+    "employerName": "Šéf zemegule s.r.o.",
+    "defaultTimes": {
+      "arrival": "08:00",
+      "breakStart": "11:30",
+      "breakEnd": "12:00",
+      "departure": "16:30"
+    },
+    "signaturePng": "data:image/png;base64,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"
+  },
+  "scConfig": {
+    "address": "Hlavná 123, 010 01 Žilina",
+    "companyAddress": "Hlavná 123, 010 01 Žilina",
+    "origin": "Domov 45, 010 01 Žilina",
+    "destination": "Bratislava, Hlavné mesto SR",
+    "purpose": "Pracovná porada, stretnutie s klientom",
+    "vehicleType": "firemné vozidlo",
+    "licensePlate": "ZA-123AB",
+    "defaultKm": 420,
+    "defaultStartTime": "06:00",
+    "perDiem": {
+      "rate5to12": 9.3,
+      "rate12to18": 13.9,
+      "rateOver18": 20.6
+    }
+  },
+  "months": {
+    "01-2026": {
+      "days": {
+        "10": "0",
+        "11": "0",
+        "12": "D",
+        "13": "D",
+        "14": "D",
+        "15": "8",
+        "16": "8",
+        "17": "0",
+        "18": "0",
+        "19": "8",
+        "20": "SC",
+        "21": "SC",
+        "22": "8",
+        "23": "8",
+        "24": "0",
+        "25": "0",
+        "26": "8",
+        "27": "8",
+        "28": "8",
+        "29": "8",
+        "30": "8",
+        "31": "0",
+        "01": "S",
+        "02": "8",
+        "03": "0",
+        "04": "0",
+        "05": "8",
+        "06": "S",
+        "07": "8",
+        "08": "8",
+        "09": "8"
+      },
+      "trips": [
+        {
+          "id": "20-21-01-2026",
+          "startDay": "20",
+          "endDay": "21",
+          "confirmed": true,
+          "startTime": "06:00",
+          "endTime": "18:30",
+          "km": 420
+        }
+      ],
+      "vacations": [
+        {
+          "id": "v-12-14-01-2026",
+          "startDay": "12",
+          "endDay": "14",
+          "confirmed": true,
+          "workingDaysOverride": null,
+          "requestDate": "05.01.2026"
+        }
+      ]
+    }
+  }
+}

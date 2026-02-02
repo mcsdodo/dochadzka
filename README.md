@@ -9,12 +9,17 @@ Jednoduchá webová aplikácia na evidenciu pracovného času zamestnanca. Fungu
 ### Pohľad na evidenciu dochádzky
 Hlavný pohľad aplikácie s mesiacovým prehľadom pracovného času. Zobrazuje jednotlivé dni s typom činnosti (pracovný deň, voľno, dovolenka, služobná cesta, atď.).
 
-![Screenshot Dochádzka](screenshot-dochadzka.png)
+![Screenshot Dochádzka](screenshots/screenshot-dochadzka.png)
 
 ### Pohľad na služobné cesty
 Pohľad s detailmi služobných ciest vrátane vygenerovaných dokumentov - Cestovného príkazu a Vyúčtovania. Umožňuje potvrdenie služobnej cesty a tlač potrebných dokladov.
 
-![Screenshot Služobné cesty](screenshot-sc.png)
+![Screenshot Služobné cesty](screenshots/screenshot-sc.png)
+
+### Pohľad na dovolenky
+Pohľad na evidenciu dovoleniek s automatickým generovaním žiadostí o dovolenku. Aplikácia automaticky detekuje súvislé bloky dovolenky z kalendára a počíta pracovné dni.
+
+![Screenshot Dovolenky](screenshots/screenshot-dovolenky.png)
 
 ## Ako začať
 
