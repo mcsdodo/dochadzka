@@ -17,6 +17,7 @@ export function normalizeData(input) {
   const months = { ...(input.months || {}) };
   Object.keys(months).forEach(key => {
     if (!months[key].trips) months[key].trips = [];
+    if (!months[key].vacations) months[key].vacations = [];
   });
   return { ...input, config: cfg, scConfig: scCfg, months };
 }

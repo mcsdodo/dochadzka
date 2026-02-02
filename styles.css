@@ -318,6 +318,104 @@ tbody tr:last-child td { border-bottom: 1px solid var(--border); }
 .vu-sig-line { border-top: 1px solid #000; margin: 2px 0; }
 .vu-sig-label { font-size: 8px; }
 
+/* Vacation view styles */
+.vacations-view { margin-top: 8px; }
+.vacation-list { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
+.vacation-item {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.vacation-confirmed { border-left: 4px solid #16a34a; cursor: pointer; }
+.vacation-confirmed:hover { background: #f0fdf4; }
+.vacation-unconfirmed { border-left: 4px solid #f59e0b; }
+.vacation-selected { background: #dcfce7; border-color: #16a34a; }
+.vacation-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 8px 0;
+  flex-wrap: wrap;
+}
+.vacation-controls label { font-size: 13px; color: var(--muted); }
+.vacation-controls input {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+}
+.vacation-controls input[type="number"] { width: 70px; }
+
+/* Vacation document styles */
+.vacation-doc {
+  font-size: 12px;
+  line-height: 1.5;
+  max-width: 600px;
+  margin: 16px auto;
+}
+.vacation-title-bar {
+  text-align: center;
+  font-weight: bold;
+  font-size: 16px;
+  background: #c6efce;
+  border: 1px solid #006100;
+  padding: 8px;
+  margin-bottom: 12px;
+}
+.vacation-content {
+  border: 1px solid var(--border);
+  padding: 20px;
+  background: #fff;
+}
+.vacation-field {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+  align-items: baseline;
+}
+.vacation-label {
+  font-size: 13px;
+  color: var(--muted);
+}
+.vacation-value {
+  font-weight: 600;
+  font-size: 13px;
+}
+.vacation-request-text {
+  text-align: center;
+  margin: 20px 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.vacation-signature {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 40px;
+  gap: 40px;
+}
+.vacation-sig-date,
+.vacation-sig-employee {
+  flex: 1;
+  text-align: center;
+}
+.vacation-sig-img {
+  display: block;
+  margin: 4px auto;
+}
+.vacation-sig-line {
+  border-top: 1px solid var(--border);
+  margin: 8px 0 4px;
+}
+.vacation-sig-label {
+  font-size: 11px;
+  color: var(--muted);
+}
+
 .hidden { display: none; }
 
 .weekend-row td {
@@ -381,4 +479,11 @@ tbody tr:last-child td { border-bottom: 1px solid var(--border); }
   .vu-table th, .vu-table td { border-color: #000; padding: 6px 8px; }
   .vu-table th { background: #f0f0f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .vu-totals td { background: #f0f0f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  /* Vacation view print styles */
+  .vacation-list,
+  .vacation-controls { display: none !important; }
+  .vacation-doc { page-break-inside: avoid; }
+  #vacationDocuments { display: block !important; }
+  .vacation-title-bar { background: #c6efce !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }

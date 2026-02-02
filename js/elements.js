@@ -41,4 +41,14 @@ export const elements = {
   scDocuments: document.getElementById('scDocuments'),
   cestovnyPrikaz: document.getElementById('cestovnyPrikaz'),
   vyuctovanie: document.getElementById('vyuctovanie'),
+  // Vacation view elements
+  tabVacations: document.getElementById('tabVacations'),
+  vacationsView: document.getElementById('vacationsView'),
+  vacationList: document.getElementById('vacationList'),
+  vacationControls: document.getElementById('vacationControls'),
+  vacationStartDay: document.getElementById('vacationStartDay'),
+  vacationEndDay: document.getElementById('vacationEndDay'),
+  vacationWorkingDays: document.getElementById('vacationWorkingDays'),
+  vacationDocuments: document.getElementById('vacationDocuments'),
+  vacationRequest: document.getElementById('vacationRequest'),
 };

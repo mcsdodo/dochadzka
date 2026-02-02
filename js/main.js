@@ -13,6 +13,8 @@ import {
 } from './storage.js';
 import { syncTrips } from './trips.js';
 import { renderCestovnyPrikaz, renderVyuctovanie } from './documents.js';
+import { syncVacations, calculateWorkingDays } from './vacations.js';
+import { renderVacationRequest } from './vacation-document.js';
 
 // Helper functions
 function getDayKeys(monthKey) {
@@ -196,6 +198,68 @@ function renderSCView() {
   }
 }
 
+// Vacation View rendering
+function renderVacationsView() {
+  const monthData = state.data.months[state.selectedMonthKey];
+  const updatedVacations = syncVacations(monthData, state.selectedMonthKey);
+  if (JSON.stringify(updatedVacations) !== JSON.stringify(monthData.vacations)) {
+    monthData.vacations = updatedVacations;
+    scheduleSave();
+  }
+
+  elements.dochadzkaView.classList.add('hidden');
+  elements.scView.classList.add('hidden');
+  elements.vacationsView.classList.remove('hidden');
+  elements.tabDochadzka.classList.remove('active');
+  elements.tabSC.classList.remove('active');
+  elements.tabVacations.classList.add('active');
+
+  const vacations = monthData.vacations || [];
+  const confirmedVacations = vacations.filter(v => v.confirmed);
+
+  if (vacations.length === 0) {
+    elements.vacationList.innerHTML = '<div class="meta">Žiadne dovolenky v tomto mesiaci.</div>';
+  } else {
+    const selectedVacation = confirmedVacations[state.selectedVacationIndex];
+    elements.vacationList.innerHTML = vacations.map((vacation, idx) => {
+      const startD = parseInt(vacation.startDay, 10);
+      const endD = parseInt(vacation.endDay, 10);
+      const [month, year] = state.selectedMonthKey.split('-');
+      const dateRange = `${vacation.startDay}.${month} - ${vacation.endDay}.${month}.${year}`;
+      const workingDays = vacation.workingDaysOverride !== null
+        ? vacation.workingDaysOverride
+        : calculateWorkingDays(vacation.startDay, vacation.endDay, state.selectedMonthKey, monthData);
+      const isSelected = selectedVacation && vacation.id === selectedVacation.id;
+      const statusClass = vacation.confirmed ? 'vacation-confirmed' : 'vacation-unconfirmed';
+      const selectedClass = isSelected ? 'vacation-selected' : '';
+      const statusText = vacation.confirmed ? '✓' : '';
+      const confirmBtn = vacation.confirmed ? '' : `<button data-idx="${idx}" class="confirm-vacation-btn">Potvrdiť</button>`;
+      const deleteBtn = `<button data-idx="${idx}" class="delete-vacation-btn danger">Vymazať</button>`;
+      return `<div class="vacation-item ${statusClass} ${selectedClass}"><span>${dateRange} (${workingDays} ${workingDays === 1 ? 'deň' : 'dní'}) ${statusText}</span><span>${confirmBtn} ${deleteBtn}</span></div>`;
+    }).join('');
+  }
+
+  if (confirmedVacations.length > 0) {
+    if (state.selectedVacationIndex >= confirmedVacations.length) state.selectedVacationIndex = 0;
+    const vacation = confirmedVacations[state.selectedVacationIndex];
+
+    elements.vacationControls.classList.remove('hidden');
+    elements.vacationStartDay.value = vacation.startDay || '';
+    elements.vacationEndDay.value = vacation.endDay || '';
+    const workingDays = vacation.workingDaysOverride !== null
+      ? vacation.workingDaysOverride
+      : calculateWorkingDays(vacation.startDay, vacation.endDay, state.selectedMonthKey, monthData);
+    elements.vacationWorkingDays.value = vacation.workingDaysOverride !== null ? vacation.workingDaysOverride : '';
+    elements.vacationWorkingDays.placeholder = workingDays;
+
+    elements.vacationDocuments.classList.remove('hidden');
+    elements.vacationRequest.innerHTML = renderVacationRequest(vacation, state.selectedMonthKey, state.data.config, workingDays);
+  } else {
+    elements.vacationControls.classList.add('hidden');
+    elements.vacationDocuments.classList.add('hidden');
+  }
+}
+
 // Main render function
 function render(focusAfterRender = false) {
   elements.unsupported.style.display = state.fsSupported ? 'none' : 'block';
@@ -207,8 +271,10 @@ function render(focusAfterRender = false) {
   const hasData = state.data !== null;
   elements.dochadzkaView.classList.toggle('hidden', !hasData || state.currentView !== 'dochadzka');
   elements.scView.classList.toggle('hidden', !hasData || state.currentView !== 'sc');
+  elements.vacationsView.classList.toggle('hidden', !hasData || state.currentView !== 'vacations');
   elements.tabDochadzka.classList.toggle('active', state.currentView === 'dochadzka');
   elements.tabSC.classList.toggle('active', state.currentView === 'sc');
+  elements.tabVacations.classList.toggle('active', state.currentView === 'vacations');
 
   elements.fileName.textContent = state.lastFileName || '';
   elements.editBtn.disabled = !hasData;
@@ -245,6 +311,13 @@ function render(focusAfterRender = false) {
   // Render SC view if active
   if (state.currentView === 'sc') {
     renderSCView();
+    updateHash();
+    return;
+  }
+
+  // Render Vacations view if active
+  if (state.currentView === 'vacations') {
+    renderVacationsView();
     updateHash();
     return;
   }
@@ -364,6 +437,7 @@ function init() {
   // View tabs with hash routing
   elements.tabDochadzka.addEventListener('click', () => { state.currentView = 'dochadzka'; updateHash(); render(false); });
   elements.tabSC.addEventListener('click', () => { state.currentView = 'sc'; updateHash(); render(false); });
+  elements.tabVacations.addEventListener('click', () => { state.currentView = 'vacations'; updateHash(); render(false); });
   window.addEventListener('hashchange', () => { setStateFromHash(); render(false); });
   setStateFromHash();
 
@@ -403,6 +477,42 @@ function init() {
     }
   });
 
+  // Vacation list click handlers
+  elements.vacationList.addEventListener('click', (e) => {
+    if (!state.data?.months?.[state.selectedMonthKey]) return;
+    const vacations = state.data.months[state.selectedMonthKey].vacations;
+    const btn = e.target.closest('button');
+    if (btn) {
+      const idx = parseInt(btn.dataset.idx, 10);
+      if (btn.classList.contains('confirm-vacation-btn')) {
+        vacations[idx].confirmed = true;
+        state.selectedVacationIndex = vacations.filter(v => v.confirmed).length - 1;
+        scheduleSave();
+        render(false);
+      } else if (btn.classList.contains('delete-vacation-btn')) {
+        if (confirm('Naozaj chcete vymazať túto dovolenku?')) {
+          vacations.splice(idx, 1);
+          if (state.selectedVacationIndex >= vacations.filter(v => v.confirmed).length) {
+            state.selectedVacationIndex = Math.max(0, vacations.filter(v => v.confirmed).length - 1);
+          }
+          scheduleSave();
+          render(false);
+        }
+      }
+      return;
+    }
+    // Click on vacation item itself to select
+    const vacationItem = e.target.closest('.vacation-item');
+    if (vacationItem && vacationItem.classList.contains('vacation-confirmed')) {
+      const allItems = [...elements.vacationList.querySelectorAll('.vacation-item')];
+      const idx = allItems.indexOf(vacationItem);
+      const vacationId = vacations[idx].id;
+      const confirmedVacations = vacations.filter(v => v.confirmed);
+      state.selectedVacationIndex = confirmedVacations.findIndex(v => v.id === vacationId);
+      render(false);
+    }
+  });
+
   // Trip controls input handlers
   const updateTrip = () => {
     const monthData = state.data.months[state.selectedMonthKey];
@@ -425,6 +535,44 @@ function init() {
   elements.tripStartTime.addEventListener('change', updateTrip);
   elements.tripEndTime.addEventListener('change', updateTrip);
   elements.tripKm.addEventListener('change', updateTrip);
+
+  // Vacation controls input handlers
+  const updateVacation = () => {
+    const monthData = state.data.months[state.selectedMonthKey];
+    const vacations = monthData.vacations;
+    const confirmedVacations = vacations.filter(v => v.confirmed);
+    if (confirmedVacations[state.selectedVacationIndex]) {
+      const vacation = confirmedVacations[state.selectedVacationIndex];
+      vacation.startDay = String(parseInt(elements.vacationStartDay.value, 10) || 1).padStart(2, '0');
+      vacation.endDay = String(parseInt(elements.vacationEndDay.value, 10) || 1).padStart(2, '0');
+      monthData.vacations = syncVacations(monthData, state.selectedMonthKey);
+      scheduleSave();
+      renderVacationsView();
+    }
+  };
+  elements.vacationStartDay.addEventListener('change', updateVacation);
+  elements.vacationEndDay.addEventListener('change', updateVacation);
+
+  // Working days override input handler
+  elements.vacationWorkingDays.addEventListener('input', () => {
+    const monthData = state.data.months[state.selectedMonthKey];
+    const vacations = monthData.vacations;
+    const confirmedVacations = vacations.filter(v => v.confirmed);
+    if (confirmedVacations[state.selectedVacationIndex]) {
+      const vacation = confirmedVacations[state.selectedVacationIndex];
+      const value = elements.vacationWorkingDays.value.trim();
+      if (value === '') {
+        vacation.workingDaysOverride = null; // Use calculated
+      } else {
+        const num = parseInt(value, 10);
+        if (num >= 1) {
+          vacation.workingDaysOverride = num;
+        }
+      }
+      scheduleSave();
+      render(false);
+    }
+  });
 
   // Table cell click/focus handlers (event delegation to avoid memory leak)
   elements.tableBody.addEventListener('click', (e) => {

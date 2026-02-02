@@ -14,8 +14,9 @@ export const state = {
   saveTimeout: null,
   lastFileName: localStorage.getItem('lastFileName') || '',
   editMode: false,
-  currentView: 'dochadzka', // 'dochadzka' | 'sc'
+  currentView: 'dochadzka', // 'dochadzka' | 'sc' | 'vacations'
   selectedTripIndex: 0,
+  selectedVacationIndex: 0,
 };
 
 export const defaultConfig = {
