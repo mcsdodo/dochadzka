@@ -71,8 +71,9 @@ function addNewMonth() {
     year = now.getFullYear();
     monthIndex = now.getMonth();
   } else {
-    const last = keys[keys.length - 1];
-    const [m, y] = last.split('-').map(Number);
+    // keys[0] is now the most recent month (reverse chronological order)
+    const mostRecent = keys[0];
+    const [m, y] = mostRecent.split('-').map(Number);
     year = y;
     monthIndex = m - 1;
     monthIndex += 1;
