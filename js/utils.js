@@ -11,7 +11,8 @@ export function getSortedMonthKeys(months) {
   return Object.keys(months || {}).sort((a, b) => {
     const [am, ay] = a.split('-').map(Number);
     const [bm, by] = b.split('-').map(Number);
-    return ay === by ? am - bm : ay - by;
+    // Sort in reverse chronological order (most recent first)
+    return ay === by ? bm - am : by - ay;
   });
 }
 
