@@ -29,9 +29,9 @@ function getFirstWorkingDayAfterVacation(endDay, month, year, holidays) {
 export function renderVacationRequest(vacation, monthKey, config, workingDays) {
   const [month, year] = monthKey.split('-');
 
-  // Format start and end dates
-  const startDate = `${vacation.startDay}.${month}.${year}`;
-  const endDate = `${vacation.endDay}.${month}.${year}`;
+  // Format start and end dates with leading zeros
+  const startDate = `${String(vacation.startDay).padStart(2, '0')}.${month}.${year}`;
+  const endDate = `${String(vacation.endDay).padStart(2, '0')}.${month}.${year}`;
 
   // Calculate approval date (1st of the month)
   const approvalDate = `01.${month}.${year}`;
