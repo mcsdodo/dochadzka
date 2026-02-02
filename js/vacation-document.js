@@ -38,9 +38,9 @@ export function renderVacationRequest(vacation, monthKey, config, workingDays) {
 
   // Get Slovak holidays for the year
   const holidays = getSlovakHolidays(parseInt(year));
-  const holidayDates = Array.from(holidays).map(date => {
-    const d = new Date(date);
-    return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
+  const holidayDates = Array.from(holidays).map(mmdd => {
+    const [month, day] = mmdd.split('-');
+    return `${day}.${month}.${year}`;
   });
 
   // Calculate first working day after vacation
