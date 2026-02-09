@@ -36,6 +36,10 @@ export function renderVacationRequest(vacation, monthKey, config, workingDays) {
   // Calculate approval date (1st of the month)
   const approvalDate = `01.${month}.${year}`;
 
+  // Request date is the day before approval date (last day of previous month)
+  const requestDateObj = new Date(parseInt(year), parseInt(month) - 1, 0);
+  const requestDate = `${String(requestDateObj.getDate()).padStart(2, '0')}.${String(requestDateObj.getMonth() + 1).padStart(2, '0')}.${requestDateObj.getFullYear()}`;
+
   // Get Slovak holidays for the year
   const holidays = getSlovakHolidays(parseInt(year));
   const holidayDates = Array.from(holidays).map(mmdd => {
@@ -96,7 +100,7 @@ export function renderVacationRequest(vacation, monthKey, config, workingDays) {
 
         <div class="vacation-signature-top">
           <div class="vacation-sig-date">
-            <span>${vacation.requestDate}</span>
+            <span>${requestDate}</span>
             <div class="vacation-sig-line"></div>
             <div class="vacation-sig-label">Dátum</div>
           </div>

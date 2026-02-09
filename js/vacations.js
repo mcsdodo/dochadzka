@@ -116,17 +116,12 @@ export function syncVacations(monthData, monthKey) {
         const startDay = String(blockStart).padStart(2, '0');
         const endDay = String(blockEnd).padStart(2, '0');
 
-        // Get current date for requestDate
-        const now = new Date();
-        const requestDate = `${String(now.getDate()).padStart(2, '0')}.${String(now.getMonth() + 1).padStart(2, '0')}.${now.getFullYear()}`;
-
         updatedVacations.push({
           id: `v-${startDay}-${endDay}-${monthKey}`,
           startDay,
           endDay,
           confirmed: false,
-          workingDaysOverride: null,
-          requestDate
+          workingDaysOverride: null
         });
         if (i < uncoveredDays.length) {
           blockStart = uncoveredDays[i];
