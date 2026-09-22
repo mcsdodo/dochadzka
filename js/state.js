@@ -42,7 +42,7 @@ export const defaultScConfig = {
   defaultStartTime: '04:30',
   perDiem: {
     rate5to12: 9.30,
-    rate12to18: 13.90,
+    rate12to18: 13.80,
     rateOver18: 20.60,
   },
 };
