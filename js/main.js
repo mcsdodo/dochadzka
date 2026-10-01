@@ -422,6 +422,22 @@ function loadTestData() {
   }
 }
 
+// File name proposed by the browser print dialog (without .pdf)
+function getPrintTitle() {
+  const monthKey = state.selectedMonthKey;
+  if (!state.data || !monthKey) return '';
+  const monthData = state.data.months?.[monthKey] || {};
+  if (state.currentView === 'sc') {
+    const trip = (monthData.trips || []).filter(t => t.confirmed)[state.selectedTripIndex];
+    return trip ? `Sluzobna-cesta_${trip.id}` : `Sluzobne-cesty_${monthKey}`;
+  }
+  if (state.currentView === 'vacations') {
+    const vacation = (monthData.vacations || []).filter(v => v.confirmed)[state.selectedVacationIndex];
+    return vacation ? `Dovolenka_${vacation.id.replace(/^v-/, '')}` : `Dovolenky_${monthKey}`;
+  }
+  return `Dochadzka_${monthKey}`;
+}
+
 // Initialize application
 function init() {
   elements.createBtn.addEventListener('click', createSampleFile);
@@ -430,6 +446,10 @@ function init() {
   elements.editBtn.addEventListener('click', () => { state.editMode = !state.editMode; render(false); });
   elements.signatureBtn.addEventListener('click', uploadSignature);
   elements.printBtn.addEventListener('click', () => window.print());
+  // Browsers use document.title as the default PDF file name
+  const defaultTitle = document.title;
+  window.addEventListener('beforeprint', () => { document.title = getPrintTitle() || defaultTitle; });
+  window.addEventListener('afterprint', () => { document.title = defaultTitle; });
   elements.newMonthBtn.addEventListener('click', () => { addNewMonth(); });
   elements.prevMonth.addEventListener('click', () => changeMonth(-1));
   elements.nextMonth.addEventListener('click', () => changeMonth(1));
