@@ -320,6 +320,16 @@ tbody tr:last-child td { border-bottom: 1px solid var(--border); }
 
 /* Vacation view styles */
 .vacations-view { margin-top: 8px; }
+.vacation-balance {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0;
+  font-size: 13px;
+}
+.vacation-balance label { color: var(--muted); }
+.vacation-balance span#vacationBalanceText { font-weight: 600; }
 .vacation-list { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
 .vacation-item {
   border: 1px solid var(--border);
@@ -619,6 +629,7 @@ tbody tr:last-child td { border-bottom: 1px solid var(--border); }
   .vu-totals td { background: #f0f0f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
   /* Vacation view print styles */
+  #vacationBalance,
   .vacation-list,
   .vacation-controls { display: none !important; }
   .vacation-doc { page-break-inside: avoid; }

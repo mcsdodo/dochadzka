@@ -44,7 +44,7 @@ export function calculateEaster(year) {
 export function getSlovakHolidays(year) {
   if (holidayCache.has(year)) return holidayCache.get(year);
   const holidays = new Set([
-    '01-01', '01-06', '05-01', '05-08', '07-05', '08-29', '09-01', '11-01', '11-17', '12-24', '12-25', '12-26',
+    '01-01', '01-06', '05-01', '05-08', '07-05', '08-29', '09-01', '09-15', '11-01', '11-17', '12-24', '12-25', '12-26',
   ]);
   const easter = calculateEaster(year);
   const goodFriday = new Date(easter);

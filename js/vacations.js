@@ -151,3 +151,15 @@ export function calculateWorkingDays(startDay, endDay, monthKey, monthData) {
 
   return count;
 }
+
+// Total vacation working days used in a given year (all months, incl. unconfirmed)
+export function calculateYearVacationDays(months, year) {
+  let total = 0;
+  for (const [monthKey, monthData] of Object.entries(months || {})) {
+    if (!monthKey.endsWith(`-${year}`)) continue;
+    for (const vacation of syncVacations(monthData, monthKey)) {
+      total += vacation.workingDaysOverride ?? calculateWorkingDays(vacation.startDay, vacation.endDay, monthKey, monthData);
+    }
+  }
+  return total;
+}

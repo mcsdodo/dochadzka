@@ -13,7 +13,7 @@ import {
 } from './storage.js';
 import { syncTrips } from './trips.js';
 import { renderCestovnyPrikaz, renderVyuctovanie } from './documents.js';
-import { syncVacations, calculateWorkingDays } from './vacations.js';
+import { syncVacations, calculateWorkingDays, calculateYearVacationDays } from './vacations.js';
 import { renderVacationRequest } from './vacation-document.js';
 
 // Helper functions
@@ -217,6 +217,18 @@ function renderVacationsView() {
 
   const vacations = monthData.vacations || [];
   const confirmedVacations = vacations.filter(v => v.confirmed);
+
+  // Yearly balance (screen only)
+  const year = state.selectedMonthKey.split('-')[1];
+  const entitlement = state.data.config.vacationEntitlement?.[year];
+  const used = calculateYearVacationDays(state.data.months, year);
+  elements.vacationBalanceYear.textContent = year;
+  if (document.activeElement !== elements.vacationEntitlement) {
+    elements.vacationEntitlement.value = entitlement ?? '';
+  }
+  elements.vacationBalanceText.textContent = entitlement == null
+    ? `Čerpané: ${used} dní`
+    : `Čerpané: ${used} dní | Zostáva: ${entitlement - used} dní`;
 
   if (vacations.length === 0) {
     elements.vacationList.innerHTML = '<div class="meta">Žiadne dovolenky v tomto mesiaci.</div>';
@@ -573,6 +585,18 @@ function init() {
   };
   elements.vacationStartDay.addEventListener('change', updateVacation);
   elements.vacationEndDay.addEventListener('change', updateVacation);
+
+  // Yearly vacation entitlement (incl. carry-over), stored per year in config
+  elements.vacationEntitlement.addEventListener('change', () => {
+    const year = state.selectedMonthKey.split('-')[1];
+    const value = parseFloat(elements.vacationEntitlement.value);
+    const entitlements = { ...(state.data.config.vacationEntitlement || {}) };
+    if (Number.isFinite(value)) entitlements[year] = value;
+    else delete entitlements[year];
+    state.data.config.vacationEntitlement = entitlements;
+    scheduleSave();
+    renderVacationsView();
+  });
 
   // Working days override input handler
   elements.vacationWorkingDays.addEventListener('input', () => {
