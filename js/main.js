@@ -15,6 +15,11 @@ import { syncTrips } from './trips.js';
 import { renderCestovnyPrikaz, renderVyuctovanie } from './documents.js';
 import { syncVacations, calculateWorkingDays, calculateYearVacationDays } from './vacations.js';
 import { renderVacationRequest } from './vacation-document.js';
+import {
+  renderSettings, applyField, applyFix, applyRateEdit, addRateRow, removeRateRow,
+  isEditingSettings, startSettingsEdit, cancelSettingsEdit, commitSettingsEdit,
+  getSettingsChanges, renderSettingsChanges
+} from './settings.js';
 
 // Helper functions
 function getDayKeys(monthKey) {
@@ -104,6 +109,18 @@ function uploadSignature() {
     reader.readAsDataURL(file);
   };
   input.click();
+}
+
+// Settings "Uložiť": show the list of changes; the file changes only after confirmation
+function requestSettingsSave() {
+  const changes = getSettingsChanges();
+  if (!changes.length) {
+    cancelSettingsEdit();
+    render(false);
+    return;
+  }
+  elements.settingsDialog.innerHTML = renderSettingsChanges(changes);
+  elements.settingsDialog.showModal();
 }
 
 function handleKeydown(e) {
@@ -288,14 +305,18 @@ function render(focusAfterRender = false) {
   elements.tabDochadzka.classList.toggle('active', state.currentView === 'dochadzka');
   elements.tabSC.classList.toggle('active', state.currentView === 'sc');
   elements.tabVacations.classList.toggle('active', state.currentView === 'vacations');
+  elements.settingsView.classList.toggle('hidden', !hasData || state.currentView !== 'settings');
+  elements.tabSettings.classList.toggle('active', state.currentView === 'settings');
 
   elements.fileName.textContent = state.lastFileName || '';
   elements.editBtn.disabled = !hasData;
-  elements.editBtn.textContent = state.editMode ? 'Hotovo' : 'Upraviť';
-  elements.editBtn.classList.toggle('editing', state.editMode);
+  const editing = state.currentView === 'settings' ? isEditingSettings() : state.editMode;
+  const doneLabel = state.currentView === 'settings' ? 'Uložiť' : 'Hotovo';
+  elements.editBtn.textContent = editing ? doneLabel : 'Upraviť';
+  elements.editBtn.classList.toggle('editing', editing);
   elements.signatureBtn.disabled = !hasData;
-  elements.printBtn.disabled = !hasData;
-  elements.monthNav.classList.toggle('hidden', !hasData);
+  elements.printBtn.disabled = !hasData || state.currentView === 'settings';
+  elements.monthNav.classList.toggle('hidden', !hasData || state.currentView === 'settings');
   elements.summary.classList.toggle('hidden', !hasData || state.currentView !== 'dochadzka');
   elements.table.classList.toggle('hidden', !hasData || state.currentView !== 'dochadzka');
   elements.legend.classList.toggle('hidden', !hasData || state.currentView !== 'dochadzka');
@@ -320,6 +341,13 @@ function render(focusAfterRender = false) {
   elements.prevMonth.disabled = currentIndex <= 0;
   elements.nextMonth.disabled = currentIndex >= monthKeys.length - 1;
   elements.monthLabel.textContent = `[${state.selectedMonthKey}]`;
+
+  // Render Settings view if active
+  if (state.currentView === 'settings') {
+    elements.settingsView.innerHTML = renderSettings();
+    updateHash();
+    return;
+  }
 
   // Render SC view if active
   if (state.currentView === 'sc') {
@@ -455,7 +483,18 @@ function init() {
   elements.createBtn.addEventListener('click', createSampleFile);
   elements.openBtn.addEventListener('click', openFile);
   elements.reconnectBtn.addEventListener('click', reconnectFile);
-  elements.editBtn.addEventListener('click', () => { state.editMode = !state.editMode; render(false); });
+  elements.editBtn.addEventListener('click', () => {
+    if (state.currentView === 'settings') {
+      if (isEditingSettings()) {
+        requestSettingsSave();
+        return;
+      }
+      startSettingsEdit();
+    } else {
+      state.editMode = !state.editMode;
+    }
+    render(false);
+  });
   elements.signatureBtn.addEventListener('click', uploadSignature);
   elements.printBtn.addEventListener('click', () => window.print());
   // Browsers use document.title as the default PDF file name
@@ -471,8 +510,38 @@ function init() {
   elements.tabDochadzka.addEventListener('click', () => { state.currentView = 'dochadzka'; updateHash(); render(false); });
   elements.tabSC.addEventListener('click', () => { state.currentView = 'sc'; updateHash(); render(false); });
   elements.tabVacations.addEventListener('click', () => { state.currentView = 'vacations'; updateHash(); render(false); });
+  elements.tabSettings.addEventListener('click', () => { state.currentView = 'settings'; updateHash(); render(false); });
   window.addEventListener('hashchange', () => { setStateFromHash(); render(false); });
   setStateFromHash();
+
+  // Settings view handlers
+  elements.settingsView.addEventListener('change', (e) => {
+    const input = e.target.closest('input[data-field], input[data-rate]');
+    if (!input || !state.data || !isEditingSettings()) return;
+    if (input.dataset.rate !== undefined) applyRateEdit(Number(input.dataset.rate), input.dataset.key, input.value);
+    else applyField(Number(input.dataset.field), input.value);
+    render(false);
+  });
+  elements.settingsView.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn || !state.data || !isEditingSettings()) return;
+    if (btn.classList.contains('settings-fix-btn')) applyFix(btn.dataset.fix);
+    else if (btn.classList.contains('settings-rate-add')) addRateRow();
+    else if (btn.classList.contains('settings-rate-del')) removeRateRow(Number(btn.dataset.rateDel));
+    else if (btn.classList.contains('settings-cancel')) cancelSettingsEdit();
+    else return;
+    render(false);
+  });
+  elements.settingsDialog.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    if (btn.classList.contains('settings-dialog-save')) {
+      commitSettingsEdit();
+      scheduleSave();
+    }
+    elements.settingsDialog.close();
+    render(false);
+  });
 
   // Trip list click handlers
   elements.tripList.addEventListener('click', (e) => {

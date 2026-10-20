@@ -54,4 +54,8 @@ export const elements = {
   vacationWorkingDays: document.getElementById('vacationWorkingDays'),
   vacationDocuments: document.getElementById('vacationDocuments'),
   vacationRequest: document.getElementById('vacationRequest'),
+  // Settings view elements
+  tabSettings: document.getElementById('tabSettings'),
+  settingsView: document.getElementById('settingsView'),
+  settingsDialog: document.getElementById('settingsDialog'),
 };

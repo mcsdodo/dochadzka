@@ -33,6 +33,7 @@ js/
   storage.js    - File System API, IndexedDB, save/load
   trips.js      - Business trip logic (SC blocks, sync)
   documents.js  - Cestovný príkaz & Vyúčtovanie rendering
+  settings.js   - Settings view: edit config/scConfig, list discrepancies
   main.js       - Init, event listeners, render functions
 styles.css      - All styling
 index.html      - HTML structure
@@ -43,14 +44,23 @@ index.html      - HTML structure
 ### Data Storage
 - JSON file selected by user via File System Access API
 - Structure: `{ config, scConfig, months: { "MM-YYYY": { days, trips } } }`
+- `normalizeData()` merges defaults under the file values, so the file always wins.
+  A change to a default in [js/state.js](./js/state.js) does not reach an existing file. Edit such
+  values in the Nastavenia view.
 
 ### URL Routing
 - Format: `#view/month/tripId`
-- Examples: `#dochadzka/01-2026`, `#sluzobne-cesty/01-2026/26-27-01-2026`
+- Examples: `#dochadzka/01-2026`, `#sluzobne-cesty/01-2026/26-27-01-2026`, `#nastavenia`
 
 ### Views
 1. **Dochádzka** - Monthly attendance calendar with day types
 2. **Služobné cesty (SC)** - Business trip management with auto-generated documents
+3. **Dovolenky** - Vacation requests and yearly balance
+4. **Nastavenia** - Edit file values that have no other UI, and list discrepancies
+   (placeholder values, obsolete or unknown fields, default times that do not give 8 h).
+   Read-only until "Upraviť". Edits go to `state.settingsDraft` (in memory only, so a
+   refresh discards them). "Uložiť" shows a dialog with each change (old -> new); only
+   "Uložiť do súboru" copies the draft into `state.data` and writes the file.
 
 ### Key Modules
 - `utils.js` - `generateMonth()`, `getSlovakHolidays()`, date parsing
@@ -69,6 +79,12 @@ index.html      - HTML structure
 
 ## Notes
 
+- Per diem (stravné) rates change every year. They live in the file as `scConfig.perDiemRates`,
+  one row per first valid month (`from: 'YYYY-MM'`, `''` = no start limit), editable in Nastavenia.
+  `getPerDiemRates(monthKey, table)` picks the row for the trip month, so old trips keep old rates.
+  `defaultPerDiemRates` in [js/state.js](./js/state.js) seeds files without a table; Nastavenia
+  reports default rows that the file lacks or that differ. Add each new year's rates there too.
+  `scConfig.perDiem` (3 numbers) in old files is obsolete; Nastavenia offers to remove it.
 - Business trips are auto-created when SC days are marked in calendar
 - Deleted trips will regenerate if SC days still exist in calendar
 - Edit trip dates to split consecutive SC days into multiple trips

@@ -14,9 +14,10 @@ export const state = {
   saveTimeout: null,
   lastFileName: localStorage.getItem('lastFileName') || '',
   editMode: false,
-  currentView: 'dochadzka', // 'dochadzka' | 'sc' | 'vacations'
+  currentView: 'dochadzka', // 'dochadzka' | 'sc' | 'vacations' | 'settings'
   selectedTripIndex: 0,
   selectedVacationIndex: 0,
+  settingsDraft: null, // in-memory settings edits, see settings.js
 };
 
 export const defaultConfig = {
@@ -42,9 +43,10 @@ export const defaultScConfig = {
   defaultStartTime: '04:30',
 };
 
-// Per diem rates by first month of validity (YYYY-MM), newest first.
+// Default per diem rates by first month of validity (YYYY-MM, '' = no start limit).
+// The file keeps its own copy in scConfig.perDiemRates, editable in the settings view.
 // New rates from 1.12.2026 apply to November 2026 trips too.
-export const perDiemRates = [
+export const defaultPerDiemRates = [
   { from: '2026-11', rate5to12: 9.80, rate12to18: 14.60, rateOver18: 21.70 },
-  { from: '0000-01', rate5to12: 9.30, rate12to18: 13.80, rateOver18: 20.60 },
+  { from: '', rate5to12: 9.30, rate12to18: 13.80, rateOver18: 20.60 },
 ];

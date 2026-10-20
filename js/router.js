@@ -8,6 +8,7 @@ export function parseHash() {
   let view = 'dochadzka';
   if (parts[0] === 'sluzobne-cesty') view = 'sc';
   else if (parts[0] === 'dovolenky') view = 'vacations';
+  else if (parts[0] === 'nastavenia') view = 'settings';
 
   return {
     view,
@@ -21,8 +22,10 @@ export function buildHash(view, month, tripId, vacationId) {
   let viewPart = 'dochadzka';
   if (view === 'sc') viewPart = 'sluzobne-cesty';
   else if (view === 'vacations') viewPart = 'dovolenky';
+  else if (view === 'settings') viewPart = 'nastavenia';
 
   let hash = `#${viewPart}`;
+  if (view === 'settings') return hash;
   if (month) hash += `/${month}`;
   if (tripId && view === 'sc') hash += `/${tripId}`;
   if (vacationId && view === 'vacations') hash += `/${vacationId}`;

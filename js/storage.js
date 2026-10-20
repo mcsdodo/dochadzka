@@ -1,6 +1,6 @@
 // File system and IndexedDB storage handling
 
-import { state, DB_NAME, DB_STORE, HANDLE_KEY, defaultConfig, defaultScConfig } from './state.js';
+import { state, DB_NAME, DB_STORE, HANDLE_KEY, defaultConfig, defaultScConfig, defaultPerDiemRates } from './state.js';
 import { getSortedMonthKeys, formatMonthKey, generateMonth } from './utils.js';
 
 // Render function will be injected to avoid circular dependency
@@ -12,8 +12,11 @@ export function setRenderFunction(fn) {
 export function normalizeData(input) {
   const cfg = { ...defaultConfig, ...(input.config || {}) };
   cfg.defaultTimes = { ...defaultConfig.defaultTimes, ...(input.config?.defaultTimes || {}) };
+  // perDiem (3 numbers) in old files is obsolete; settings view reports it
   const scCfg = { ...defaultScConfig, ...(input.scConfig || {}) };
-  delete scCfg.perDiem; // rates now live in perDiemRates (state.js)
+  if (!Array.isArray(scCfg.perDiemRates) || !scCfg.perDiemRates.length) {
+    scCfg.perDiemRates = defaultPerDiemRates.map(r => ({ ...r }));
+  }
   const months = { ...(input.months || {}) };
   Object.keys(months).forEach(key => {
     if (!months[key].trips) months[key].trips = [];

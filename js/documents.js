@@ -154,7 +154,7 @@ export function renderVyuctovanie(trip, monthKey, config, scConfig) {
   const startDay = parseInt(trip.startDay, 10);
   const endDay = parseInt(trip.endDay, 10);
   const isSingleDay = startDay === endDay;
-  const rates = getPerDiemRates(monthKey);
+  const rates = getPerDiemRates(monthKey, scConfig.perDiemRates);
   const homeAddr = scConfig.origin;
   const destAddr = scConfig.destination;
   let tableRows = '';
