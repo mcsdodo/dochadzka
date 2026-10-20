@@ -40,9 +40,11 @@ export const defaultScConfig = {
   licensePlate: 'XX-000XX',
   defaultKm: 370,
   defaultStartTime: '04:30',
-  perDiem: {
-    rate5to12: 9.30,
-    rate12to18: 13.80,
-    rateOver18: 20.60,
-  },
 };
+
+// Per diem rates by first month of validity (YYYY-MM), newest first.
+// New rates from 1.12.2026 apply to November 2026 trips too.
+export const perDiemRates = [
+  { from: '2026-11', rate5to12: 9.80, rate12to18: 14.60, rateOver18: 21.70 },
+  { from: '0000-01', rate5to12: 9.30, rate12to18: 13.80, rateOver18: 20.60 },
+];

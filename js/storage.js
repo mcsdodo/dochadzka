@@ -13,7 +13,7 @@ export function normalizeData(input) {
   const cfg = { ...defaultConfig, ...(input.config || {}) };
   cfg.defaultTimes = { ...defaultConfig.defaultTimes, ...(input.config?.defaultTimes || {}) };
   const scCfg = { ...defaultScConfig, ...(input.scConfig || {}) };
-  scCfg.perDiem = { ...defaultScConfig.perDiem, ...(input.scConfig?.perDiem || {}) };
+  delete scCfg.perDiem; // rates now live in perDiemRates (state.js)
   const months = { ...(input.months || {}) };
   Object.keys(months).forEach(key => {
     if (!months[key].trips) months[key].trips = [];

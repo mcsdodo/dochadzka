@@ -1,7 +1,7 @@
 // Document rendering for Cestovný príkaz and Vyúčtovanie
 
 import { calculateHoursBetween } from './utils.js';
-import { getPerDiem } from './trips.js';
+import { getPerDiem, getPerDiemRates } from './trips.js';
 
 export function renderCestovnyPrikaz(trip, monthKey, config, scConfig) {
   const [month, year] = monthKey.split('-');
@@ -154,7 +154,7 @@ export function renderVyuctovanie(trip, monthKey, config, scConfig) {
   const startDay = parseInt(trip.startDay, 10);
   const endDay = parseInt(trip.endDay, 10);
   const isSingleDay = startDay === endDay;
-  const rates = scConfig.perDiem;
+  const rates = getPerDiemRates(monthKey);
   const homeAddr = scConfig.origin;
   const destAddr = scConfig.destination;
   let tableRows = '';

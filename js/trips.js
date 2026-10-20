@@ -1,5 +1,7 @@
 // Business trip (Služobná cesta) logic
 
+import { perDiemRates } from './state.js';
+
 export function findSCBlocks(monthData) {
   const days = monthData.days || {};
   const dayKeys = Object.keys(days)
@@ -74,6 +76,11 @@ export function syncTrips(monthData, monthKey, scConfig) {
   }
 
   return updatedTrips;
+}
+
+export function getPerDiemRates(monthKey) {
+  const [month, year] = monthKey.split('-');
+  return perDiemRates.find(r => `${year}-${month}` >= r.from);
 }
 
 export function getPerDiem(hours, rates) {
