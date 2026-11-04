@@ -75,7 +75,8 @@ index.html      - HTML structure
 - `SC` - Služobná cesta (business trip)
 - `PN` - Práceneschopnosť (sick leave)
 - `0` - Weekend/no work
-- `4` - Half day (4 hours, key `4`). Arrival from `defaultTimes`, no break, departure = arrival + 4 h
+- `4.5` - Half day (4.5 hours, key `4`). Arrival from `defaultTimes`, no break, departure = arrival + 4.5 h.
+  `4` (from the earlier key `4`) shows times the same way, with departure = arrival + 4 h
 - Other custom hours (e.g., `6`) count in the total but have no key and show no times
 
 ## Notes

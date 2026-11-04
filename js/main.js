@@ -59,8 +59,8 @@ function addHoursToTime(time, hours) {
 function getTimesForValue(value) {
   const defaults = state.data?.config?.defaultTimes || defaultConfig.defaultTimes;
   if (value === '8') return { arrival: defaults.arrival, breakStart: defaults.breakStart, breakEnd: defaults.breakEnd, departure: defaults.departure, hours: '8' };
-  // Half day: no break (ZP §91 requires a break only after more than 6 h)
-  if (value === '4') return { arrival: defaults.arrival, breakStart: '-', breakEnd: '-', departure: addHoursToTime(defaults.arrival, 4), hours: '4' };
+  // Half day (key 4 gives '4.5'; '4' is from older files): no break, ZP §91 requires one only after more than 6 h
+  if (value === '4.5' || value === '4') return { arrival: defaults.arrival, breakStart: '-', breakEnd: '-', departure: addHoursToTime(defaults.arrival, Number(value)), hours: value };
   if (value === '0') return { arrival: '-', breakStart: '-', breakEnd: '-', departure: '-', hours: '0' };
   if (value === 'SC') return { arrival: defaults.arrival, breakStart: defaults.breakStart, breakEnd: defaults.breakEnd, departure: defaults.departure, hours: 'SC' };
   return { arrival: '-', breakStart: '-', breakEnd: '-', departure: '-', hours: value };
@@ -154,7 +154,7 @@ function handleKeydown(e) {
   const current = state.data.months[state.selectedMonthKey].days[dayKey];
   let nextValue = current;
   if (upper === '8') nextValue = '8';
-  else if (upper === '4') nextValue = '4';
+  else if (upper === '4') nextValue = '4.5';
   else if (upper === '0') nextValue = '0';
   else if (upper === 'D') nextValue = 'D';
   else if (upper === 'P') nextValue = 'PN';
@@ -411,8 +411,8 @@ function render(focusAfterRender = false) {
   });
 
   // Render day summary
-  const labels = { '8': 'Práca', '4': 'Práca 4h', 'D': 'Dovolenka', 'SC': 'Služobná cesta', 'PN': 'PN', 'O': 'OČR', 'IN': 'Iná neprítomnosť', 'S': 'Sviatok' };
-  const order = ['8', '4', 'SC', 'D', 'PN', 'O', 'IN', 'S'];
+  const labels = { '8': 'Práca', '4.5': 'Práca 4.5h', '4': 'Práca 4h', 'D': 'Dovolenka', 'SC': 'Služobná cesta', 'PN': 'PN', 'O': 'OČR', 'IN': 'Iná neprítomnosť', 'S': 'Sviatok' };
+  const order = ['8', '4.5', '4', 'SC', 'D', 'PN', 'O', 'IN', 'S'];
   const summaryParts = order
     .filter(key => counts[key])
     .map(key => `${labels[key] || key}: ${counts[key]}`);

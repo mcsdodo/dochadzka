@@ -70,7 +70,7 @@ V režime úprav (po kliknutí na **Upraviť**):
 | Klávesa | Hodnota | Význam |
 |---------|---------|--------|
 | `8` | 8 | Plný pracovný deň |
-| `4` | 4 | Polovičný pracovný deň (4 h, bez prestávky) |
+| `4` | 4.5 | Polovičný pracovný deň (4,5 h, bez prestávky) |
 | `0` | 0 | Voľný deň |
 | `D` | D | Dovolenka |
 | `P` | PN | Práceneschopnosť |
