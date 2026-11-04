@@ -50,9 +50,17 @@ function setSelectedDay(index) {
   render(true);
 }
 
+function addHoursToTime(time, hours) {
+  const [h, m] = time.split(':').map(Number);
+  const total = (h * 60 + m + hours * 60) % (24 * 60);
+  return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
+}
+
 function getTimesForValue(value) {
   const defaults = state.data?.config?.defaultTimes || defaultConfig.defaultTimes;
   if (value === '8') return { arrival: defaults.arrival, breakStart: defaults.breakStart, breakEnd: defaults.breakEnd, departure: defaults.departure, hours: '8' };
+  // Half day: no break (ZP §91 requires a break only after more than 6 h)
+  if (value === '4') return { arrival: defaults.arrival, breakStart: '-', breakEnd: '-', departure: addHoursToTime(defaults.arrival, 4), hours: '4' };
   if (value === '0') return { arrival: '-', breakStart: '-', breakEnd: '-', departure: '-', hours: '0' };
   if (value === 'SC') return { arrival: defaults.arrival, breakStart: defaults.breakStart, breakEnd: defaults.breakEnd, departure: defaults.departure, hours: 'SC' };
   return { arrival: '-', breakStart: '-', breakEnd: '-', departure: '-', hours: value };
@@ -138,7 +146,7 @@ function handleKeydown(e) {
   }
 
   const upper = key.toUpperCase();
-  const valid = ['8', '0', 'D', 'P', 'O', 'S', 'I'];
+  const valid = ['8', '4', '0', 'D', 'P', 'O', 'S', 'I'];
   if (!valid.includes(upper)) return;
   const dayKeys = getDayKeys(state.selectedMonthKey);
   const dayKey = dayKeys[state.selectedDayIndex];
@@ -146,6 +154,7 @@ function handleKeydown(e) {
   const current = state.data.months[state.selectedMonthKey].days[dayKey];
   let nextValue = current;
   if (upper === '8') nextValue = '8';
+  else if (upper === '4') nextValue = '4';
   else if (upper === '0') nextValue = '0';
   else if (upper === 'D') nextValue = 'D';
   else if (upper === 'P') nextValue = 'PN';
@@ -402,8 +411,8 @@ function render(focusAfterRender = false) {
   });
 
   // Render day summary
-  const labels = { '8': 'Práca', 'D': 'Dovolenka', 'SC': 'Služobná cesta', 'PN': 'PN', 'O': 'OČR', 'IN': 'Iná neprítomnosť', 'S': 'Sviatok' };
-  const order = ['8', 'SC', 'D', 'PN', 'O', 'IN', 'S'];
+  const labels = { '8': 'Práca', '4': 'Práca 4h', 'D': 'Dovolenka', 'SC': 'Služobná cesta', 'PN': 'PN', 'O': 'OČR', 'IN': 'Iná neprítomnosť', 'S': 'Sviatok' };
+  const order = ['8', '4', 'SC', 'D', 'PN', 'O', 'IN', 'S'];
   const summaryParts = order
     .filter(key => counts[key])
     .map(key => `${labels[key] || key}: ${counts[key]}`);
