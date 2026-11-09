@@ -29,9 +29,15 @@ export const defaultConfig = {
     breakEnd: '12:00',
     departure: '16:30',
   },
-  scHalfDayFrom: '2026-10',
   signaturePng: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
 };
+
+// Working hours of a business trip day in attendance, rows { from: 'YYYY-MM' | '', hours }.
+// The file keeps its own copy in config.scWorkHours, editable in the settings view.
+export const defaultScWorkHours = [
+  { from: '2026-10', hours: 4.5 },
+  { from: '', hours: 8 },
+];
 
 export const defaultScConfig = {
   address: 'Adresa 123, 010 01 Mesto',

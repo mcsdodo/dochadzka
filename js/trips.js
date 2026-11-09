@@ -77,10 +77,10 @@ export function syncTrips(monthData, monthKey, scConfig) {
   return updatedTrips;
 }
 
-// rateTable: rows { from: 'YYYY-MM' | '', rate5to12, rate12to18, rateOver18 }
-export function getPerDiemRates(monthKey, rateTable) {
+// table: rows { from: 'YYYY-MM' | '', ... }. Gives the newest row valid in the month, else the oldest row.
+export function getRowForMonth(monthKey, table) {
   const [month, year] = monthKey.split('-');
-  const sorted = [...rateTable].sort((a, b) => b.from.localeCompare(a.from));
+  const sorted = [...table].sort((a, b) => b.from.localeCompare(a.from));
   return sorted.find(r => `${year}-${month}` >= r.from) || sorted[sorted.length - 1];
 }
 

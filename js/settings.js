@@ -17,7 +17,6 @@ const FIELDS = [
   { path: ['config', 'defaultTimes', 'breakStart'], label: 'Prestávka od', type: 'time' },
   { path: ['config', 'defaultTimes', 'breakEnd'], label: 'Prestávka do', type: 'time' },
   { path: ['config', 'defaultTimes', 'departure'], label: 'Odchod', type: 'time' },
-  { path: ['config', 'scHalfDayFrom'], label: 'SC ako 4,5 h od', type: 'month', use: 'Dochádzka: skôr 8 h a čas ako deň typu 8' },
   { section: 'Služobné cesty' },
   { path: ['scConfig', 'origin'], label: 'Bydlisko / miesto odchodu', use: 'Cestovný príkaz, vyúčtovanie' },
   { path: ['scConfig', 'destination'], label: 'Miesto konania', use: 'Cestovný príkaz, vyúčtovanie' },
@@ -29,7 +28,7 @@ const FIELDS = [
 ];
 
 const KNOWN_KEYS = {
-  config: [...Object.keys(defaultConfig), 'utvar', 'vacationEntitlement'],
+  config: [...Object.keys(defaultConfig), 'utvar', 'vacationEntitlement', 'scWorkHours'],
   scConfig: [...Object.keys(defaultScConfig), 'companyAddress', 'perDiem', 'perDiemRates'],
 };
 
@@ -111,8 +110,14 @@ function formatRateRow(r) {
   return `${formatFrom(r.from)}: ${RATE_KEYS.map(k => formatRate(r[k])).join(' / ')}`;
 }
 
-function sortRates() {
-  current().scConfig.perDiemRates.sort((a, b) => b.from.localeCompare(a.from));
+// Tables with one row per first valid month: where the rows are, which columns are numbers
+const TABLES = {
+  perDiem: { rows: data => data.scConfig.perDiemRates, numbers: RATE_KEYS },
+  scHours: { rows: data => data.config.scWorkHours, numbers: ['hours'] },
+};
+
+function sortRates(table) {
+  TABLES[table].rows(current()).sort((a, b) => b.from.localeCompare(a.from));
 }
 
 // Each issue: { text, fix? } where fix is an action id handled in applyFix()
@@ -125,7 +130,7 @@ export function findDiscrepancies() {
     const def = getDefault(f.path);
     if (value === undefined || value === '') {
       issues.push({ text: `${f.label}: hodnota chýba.` });
-    } else if (def !== undefined && value === def && f.type !== 'time' && f.type !== 'month' && f.path[1] !== 'defaultKm') {
+    } else if (def !== undefined && value === def && f.type !== 'time' && f.path[1] !== 'defaultKm') {
       issues.push({ text: `${f.label}: hodnota je stále ukážková ("${value}").` });
     }
   });
@@ -168,6 +173,13 @@ export function findDiscrepancies() {
         fix: `addDefaultRate:${def.from}`, fixLabel: 'Prevziať z aplikácie',
       });
     }
+  });
+
+  const seenHoursFrom = new Set();
+  data.config.scWorkHours.forEach(r => {
+    if (seenHoursFrom.has(r.from)) issues.push({ text: `Hodiny za SC deň: viac riadkov s platnosťou ${formatFrom(r.from)}.` });
+    seenHoursFrom.add(r.from);
+    if (!(Number(r.hours) > 0)) issues.push({ text: `Hodiny za SC deň ${formatFrom(r.from)}: hodnota nie je kladné číslo.` });
   });
 
   const { companyAddress, address } = data.scConfig;
@@ -218,7 +230,7 @@ export function applyFix(fix) {
     const def = defaultPerDiemRates.find(r => r.from === from);
     const rates = data.scConfig.perDiemRates.filter(r => r.from !== from);
     data.scConfig.perDiemRates = [...rates, { ...def }];
-    sortRates();
+    sortRates('perDiem');
   } else if (fix.startsWith('removeKey:')) {
     const [section, key] = fix.slice('removeKey:'.length).split('.');
     delete data[section][key];
@@ -232,26 +244,27 @@ export function applyField(index, rawValue) {
   setPath(field.path, value);
 }
 
-export function applyRateEdit(index, key, rawValue) {
-  const row = current().scConfig.perDiemRates[index];
+export function applyRateEdit(table, index, key, rawValue) {
+  const { rows, numbers } = TABLES[table];
+  const row = rows(current())[index];
   if (!row) return;
   if (key === 'from') row.from = rawValue;
-  else if (RATE_KEYS.includes(key)) row[key] = parseFloat(rawValue) || 0;
-  sortRates();
+  else if (numbers.includes(key)) row[key] = parseFloat(rawValue) || 0;
+  sortRates(table);
 }
 
-export function addRateRow() {
-  sortRates();
-  const rates = current().scConfig.perDiemRates;
+export function addRateRow(table) {
+  sortRates(table);
+  const rows = TABLES[table].rows(current());
   const now = new Date();
   const from = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-  rates.push({ ...rates[0], from });
-  sortRates();
+  rows.push({ ...rows[0], from });
+  sortRates(table);
 }
 
-export function removeRateRow(index) {
-  const rates = current().scConfig.perDiemRates;
-  if (rates.length > 1) rates.splice(index, 1);
+export function removeRateRow(table, index) {
+  const rows = TABLES[table].rows(current());
+  if (rows.length > 1) rows.splice(index, 1);
 }
 
 function formatValue(path, value) {
@@ -271,15 +284,14 @@ export function getSettingsChanges() {
   const draft = getDraft();
   if (!draft) return [];
   const changes = [];
-  // One change per rate row, matched by its start month
-  const diffRates = (before, after) => {
+  // One change per table row, matched by its start month
+  const diffRows = (before, after, label, format) => {
     const froms = [...new Set([...before, ...after].map(r => r.from))].sort().reverse();
-    const formatRates = r => (r ? RATE_KEYS.map(k => formatRate(r[k])).join(' / ') : '(nie je)');
     froms.forEach(from => {
       const a = before.find(r => r.from === from);
       const b = after.find(r => r.from === from);
       if (JSON.stringify(a) !== JSON.stringify(b)) {
-        changes.push({ label: `Sadzby stravného ${formatFrom(from)}`, from: formatRates(a), to: formatRates(b) });
+        changes.push({ label: `${label} ${formatFrom(from)}`, from: a ? format(a) : '(nie je)', to: b ? format(b) : '(nie je)' });
       }
     });
   };
@@ -291,7 +303,9 @@ export function getSettingsChanges() {
       const b = after?.[key];
       const isObj = v => v && typeof v === 'object' && !Array.isArray(v);
       if (path === 'scConfig.perDiemRates') {
-        diffRates(a || [], b || []);
+        diffRows(a || [], b || [], 'Sadzby stravného', r => RATE_KEYS.map(k => formatRate(r[k])).join(' / '));
+      } else if (path === 'config.scWorkHours') {
+        diffRows(a || [], b || [], 'Hodiny za SC deň', r => String(r.hours));
       } else if (path !== 'scConfig.perDiem' && isObj(a) && isObj(b)) {
         walk(a, b, path);
       } else if (JSON.stringify(a) !== JSON.stringify(b)) {
@@ -344,9 +358,17 @@ export function renderSettings() {
   const rates = current().scConfig.perDiemRates;
   const ratesHtml = rates.map((r, idx) => `
     <tr>
-      <td><input type="month" data-rate="${idx}" data-key="from" value="${escapeHtml(r.from)}"${disabled} />${r.from ? '' : ' <span class="meta">bez začiatku</span>'}</td>
-      ${RATE_KEYS.map(k => `<td><input type="number" step="0.01" min="0" data-rate="${idx}" data-key="${k}" value="${escapeHtml(formatRate(r[k]))}"${disabled} /></td>`).join('')}
-      <td>${editing && rates.length > 1 ? `<button class="settings-rate-del danger" data-rate-del="${idx}">Vymazať</button>` : ''}</td>
+      <td><input type="month" data-table="perDiem" data-rate="${idx}" data-key="from" value="${escapeHtml(r.from)}"${disabled} />${r.from ? '' : ' <span class="meta">bez začiatku</span>'}</td>
+      ${RATE_KEYS.map(k => `<td><input type="number" step="0.01" min="0" data-table="perDiem" data-rate="${idx}" data-key="${k}" value="${escapeHtml(formatRate(r[k]))}"${disabled} /></td>`).join('')}
+      <td>${editing && rates.length > 1 ? `<button class="settings-rate-del danger" data-table="perDiem" data-rate-del="${idx}">Vymazať</button>` : ''}</td>
+    </tr>`).join('');
+
+  const scHours = current().config.scWorkHours;
+  const scHoursHtml = scHours.map((r, idx) => `
+    <tr>
+      <td><input type="month" data-table="scHours" data-rate="${idx}" data-key="from" value="${escapeHtml(r.from)}"${disabled} />${r.from ? '' : ' <span class="meta">bez začiatku</span>'}</td>
+      <td><input type="number" step="0.5" min="0" data-table="scHours" data-rate="${idx}" data-key="hours" value="${escapeHtml(r.hours)}"${disabled} /></td>
+      <td>${editing && scHours.length > 1 ? `<button class="settings-rate-del danger" data-table="scHours" data-rate-del="${idx}">Vymazať</button>` : ''}</td>
     </tr>`).join('');
 
   const modeHtml = editing
@@ -364,12 +386,21 @@ export function renderSettings() {
       <div class="settings-fields">${fieldsHtml}</div>
     </section>
     <section class="settings-section">
+      <h2>Hodiny za SC deň</h2>
+      <p class="meta">Platí len pre záložku Dochádzka: počet hodín a odchod v SC dni. Cestovný príkaz a stravné sa nemenia. Mesiac použije riadok s najnovšou platnosťou, ktorá nie je neskôr ako tento mesiac.</p>
+      <table class="settings-rates">
+        <thead><tr><th>Platnosť od</th><th>Hodiny</th><th></th></tr></thead>
+        <tbody>${scHoursHtml}</tbody>
+      </table>
+      ${editing ? '<button class="settings-rate-add" data-table="scHours">+ Nový riadok</button>' : ''}
+    </section>
+    <section class="settings-section">
       <h2>Sadzby stravného (EUR)</h2>
       <p class="meta">Cesta použije riadok s najnovšou platnosťou, ktorá nie je neskôr ako mesiac cesty. Riadok bez začiatku platí pre všetky staršie cesty.</p>
       <table class="settings-rates">
         <thead><tr><th>Platnosť od</th><th>5 - 12 h</th><th>12 - 18 h</th><th>nad 18 h</th><th></th></tr></thead>
         <tbody>${ratesHtml}</tbody>
       </table>
-      ${editing ? '<button class="settings-rate-add">+ Nové sadzby</button>' : ''}
+      ${editing ? '<button class="settings-rate-add" data-table="perDiem">+ Nové sadzby</button>' : ''}
     </section>`;
 }

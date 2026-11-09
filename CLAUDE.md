@@ -72,9 +72,10 @@ index.html      - HTML structure
 - `8` - Full day (8 hours)
 - `D` - Dovolenka (vacation)
 - `S` - Sviatok (holiday)
-- `SC` - Služobná cesta (business trip). In Dochádzka only: from month `config.scHalfDayFrom`
-  (default `2026-10`, editable in Nastavenia) the day counts 4.5 h, arrival from `defaultTimes`, no break,
-  departure = arrival + 4.5 h. Earlier months count 8 h with the full `defaultTimes`.
+- `SC` - Služobná cesta (business trip). In Dochádzka only, the hours of the day come from the table
+  `config.scWorkHours` (rows `{ from: 'YYYY-MM' | '', hours }`, editable in Nastavenia, seeded by
+  `defaultScWorkHours`: 4.5 h from `2026-10`, else 8 h). Arrival from `defaultTimes`. The break is only
+  after more than 6 h. Departure = arrival + hours + break.
   The travel order keeps its fixed "Normálna pracovná doba" 08:00 - 16:30, and trip times and per diem do not use this.
 - `PN` - Práceneschopnosť (sick leave)
 - `0` - Weekend/no work
@@ -86,7 +87,7 @@ index.html      - HTML structure
 
 - Per diem (stravné) rates change every year. They live in the file as `scConfig.perDiemRates`,
   one row per first valid month (`from: 'YYYY-MM'`, `''` = no start limit), editable in Nastavenia.
-  `getPerDiemRates(monthKey, table)` picks the row for the trip month, so old trips keep old rates.
+  `getRowForMonth(monthKey, table)` picks the row for the trip month, so old trips keep old rates.
   `defaultPerDiemRates` in [js/state.js](./js/state.js) seeds files without a table; Nastavenia
   reports default rows that the file lacks or that differ. Add each new year's rates there too.
   `scConfig.perDiem` (3 numbers) in old files is obsolete; Nastavenia offers to remove it.

@@ -75,7 +75,7 @@ V režime úprav (po kliknutí na **Upraviť**):
 | `D` | D | Dovolenka |
 | `P` | PN | Práceneschopnosť |
 | `O` | O | OČR (ošetrovanie člena rodiny) |
-| `S` | SC | Služobná cesta |
+| `S` | SC | Služobná cesta (hodiny za deň sú v Nastaveniach) |
 | `I` | IN | Iná neprítomnosť |
 
 Navigácia medzi dňami: **šípky hore/dole**

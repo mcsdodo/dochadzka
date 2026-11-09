@@ -4,14 +4,14 @@ import { elements } from './elements.js';
 import { state, defaultConfig } from './state.js';
 import {
   getSortedMonthKeys, formatMonthKey, generateMonth,
-  isWeekendDay, isHolidayDay, isSunday, getDayOfWeek
+  isWeekendDay, isHolidayDay, isSunday, getDayOfWeek, calculateHoursBetween
 } from './utils.js';
 import { setStateFromHash, updateHash } from './router.js';
 import {
   setRenderFunction, createSampleFile, openFile, reconnectFile,
   loadStoredHandle, loadFromHandle, scheduleSave, normalizeData
 } from './storage.js';
-import { syncTrips } from './trips.js';
+import { syncTrips, getRowForMonth } from './trips.js';
 import { renderCestovnyPrikaz, renderVyuctovanie } from './documents.js';
 import { syncVacations, calculateWorkingDays, calculateYearVacationDays } from './vacations.js';
 import { renderVacationRequest } from './vacation-document.js';
@@ -52,15 +52,13 @@ function setSelectedDay(index) {
 
 function addHoursToTime(time, hours) {
   const [h, m] = time.split(':').map(Number);
-  const total = (h * 60 + m + hours * 60) % (24 * 60);
+  const total = Math.round(h * 60 + m + hours * 60) % (24 * 60);
   return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
 }
 
-// From config.scHalfDayFrom ('YYYY-MM') a business trip day counts as a 4.5 h working day in attendance
-function isHalfDaySC(monthKey) {
-  const from = state.data?.config?.scHalfDayFrom ?? defaultConfig.scHalfDayFrom;
-  const [month, year] = monthKey.split('-');
-  return Boolean(from) && `${year}-${month}` >= from;
+// Working hours of a business trip day in attendance, from the table in Nastavenia
+function getScHours(monthKey) {
+  return Number(getRowForMonth(monthKey, state.data.config.scWorkHours).hours);
 }
 
 function getTimesForValue(value, monthKey) {
@@ -69,8 +67,18 @@ function getTimesForValue(value, monthKey) {
   // Half day (key 4 gives '4.5'; '4' is from older files): no break, ZP §91 requires one only after more than 6 h
   if (value === '4.5' || value === '4') return { arrival: defaults.arrival, breakStart: '-', breakEnd: '-', departure: addHoursToTime(defaults.arrival, Number(value)), hours: value };
   if (value === '0') return { arrival: '-', breakStart: '-', breakEnd: '-', departure: '-', hours: '0' };
-  if (value === 'SC' && isHalfDaySC(monthKey)) return { arrival: defaults.arrival, breakStart: '-', breakEnd: '-', departure: addHoursToTime(defaults.arrival, 4.5), hours: 'SC' };
-  if (value === 'SC') return { arrival: defaults.arrival, breakStart: defaults.breakStart, breakEnd: defaults.breakEnd, departure: defaults.departure, hours: 'SC' };
+  if (value === 'SC') {
+    const hours = getScHours(monthKey);
+    // ZP §91 requires a break only after more than 6 h
+    const breakHours = hours > 6 ? calculateHoursBetween(defaults.breakStart, defaults.breakEnd) : 0;
+    return {
+      arrival: defaults.arrival,
+      breakStart: breakHours ? defaults.breakStart : '-',
+      breakEnd: breakHours ? defaults.breakEnd : '-',
+      departure: addHoursToTime(defaults.arrival, hours + breakHours),
+      hours: 'SC',
+    };
+  }
   return { arrival: '-', breakStart: '-', breakEnd: '-', departure: '-', hours: value };
 }
 
@@ -78,7 +86,7 @@ function calculateTotal(monthKey) {
   const dayKeys = getDayKeys(monthKey);
   return dayKeys.reduce((sum, key) => {
     const v = state.data.months[monthKey].days[key];
-    if (v === 'SC') return sum + (isHalfDaySC(monthKey) ? 4.5 : 8);
+    if (v === 'SC') return sum + getScHours(monthKey);
     const asNum = Number(v);
     return sum + (Number.isFinite(asNum) ? asNum : 0);
   }, 0);
@@ -535,7 +543,7 @@ function init() {
   elements.settingsView.addEventListener('change', (e) => {
     const input = e.target.closest('input[data-field], input[data-rate]');
     if (!input || !state.data || !isEditingSettings()) return;
-    if (input.dataset.rate !== undefined) applyRateEdit(Number(input.dataset.rate), input.dataset.key, input.value);
+    if (input.dataset.rate !== undefined) applyRateEdit(input.dataset.table, Number(input.dataset.rate), input.dataset.key, input.value);
     else applyField(Number(input.dataset.field), input.value);
     render(false);
   });
@@ -543,8 +551,8 @@ function init() {
     const btn = e.target.closest('button');
     if (!btn || !state.data || !isEditingSettings()) return;
     if (btn.classList.contains('settings-fix-btn')) applyFix(btn.dataset.fix);
-    else if (btn.classList.contains('settings-rate-add')) addRateRow();
-    else if (btn.classList.contains('settings-rate-del')) removeRateRow(Number(btn.dataset.rateDel));
+    else if (btn.classList.contains('settings-rate-add')) addRateRow(btn.dataset.table);
+    else if (btn.classList.contains('settings-rate-del')) removeRateRow(btn.dataset.table, Number(btn.dataset.rateDel));
     else if (btn.classList.contains('settings-cancel')) cancelSettingsEdit();
     else return;
     render(false);
