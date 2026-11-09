@@ -56,12 +56,20 @@ function addHoursToTime(time, hours) {
   return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
 }
 
-function getTimesForValue(value) {
+// From config.scHalfDayFrom ('YYYY-MM') a business trip day counts as a 4.5 h working day in attendance
+function isHalfDaySC(monthKey) {
+  const from = state.data?.config?.scHalfDayFrom ?? defaultConfig.scHalfDayFrom;
+  const [month, year] = monthKey.split('-');
+  return Boolean(from) && `${year}-${month}` >= from;
+}
+
+function getTimesForValue(value, monthKey) {
   const defaults = state.data?.config?.defaultTimes || defaultConfig.defaultTimes;
   if (value === '8') return { arrival: defaults.arrival, breakStart: defaults.breakStart, breakEnd: defaults.breakEnd, departure: defaults.departure, hours: '8' };
   // Half day (key 4 gives '4.5'; '4' is from older files): no break, ZP §91 requires one only after more than 6 h
   if (value === '4.5' || value === '4') return { arrival: defaults.arrival, breakStart: '-', breakEnd: '-', departure: addHoursToTime(defaults.arrival, Number(value)), hours: value };
   if (value === '0') return { arrival: '-', breakStart: '-', breakEnd: '-', departure: '-', hours: '0' };
+  if (value === 'SC' && isHalfDaySC(monthKey)) return { arrival: defaults.arrival, breakStart: '-', breakEnd: '-', departure: addHoursToTime(defaults.arrival, 4.5), hours: 'SC' };
   if (value === 'SC') return { arrival: defaults.arrival, breakStart: defaults.breakStart, breakEnd: defaults.breakEnd, departure: defaults.departure, hours: 'SC' };
   return { arrival: '-', breakStart: '-', breakEnd: '-', departure: '-', hours: value };
 }
@@ -70,7 +78,7 @@ function calculateTotal(monthKey) {
   const dayKeys = getDayKeys(monthKey);
   return dayKeys.reduce((sum, key) => {
     const v = state.data.months[monthKey].days[key];
-    if (v === 'SC') return sum + 8;
+    if (v === 'SC') return sum + (isHalfDaySC(monthKey) ? 4.5 : 8);
     const asNum = Number(v);
     return sum + (Number.isFinite(asNum) ? asNum : 0);
   }, 0);
@@ -383,7 +391,7 @@ function render(focusAfterRender = false) {
   const totalHours = calculateTotal(state.selectedMonthKey);
   elements.tableBody.innerHTML = dayKeys.map((dayKey, idx) => {
     const value = currentMonth.days[dayKey];
-    const times = getTimesForValue(value);
+    const times = getTimesForValue(value, state.selectedMonthKey);
     const selected = idx === state.selectedDayIndex;
     const weekend = isWeekendDay(state.selectedMonthKey, dayKey);
     const holiday = isHolidayDay(state.selectedMonthKey, dayKey);

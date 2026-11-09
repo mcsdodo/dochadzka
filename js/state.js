@@ -29,6 +29,7 @@ export const defaultConfig = {
     breakEnd: '12:00',
     departure: '16:30',
   },
+  scHalfDayFrom: '2026-10',
   signaturePng: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
 };
 

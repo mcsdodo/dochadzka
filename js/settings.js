@@ -12,11 +12,12 @@ const FIELDS = [
   { path: ['config', 'employerName'], label: 'Zamestnávateľ', use: 'Dochádzka, cestovný príkaz' },
   { path: ['scConfig', 'address'], label: 'Adresa zamestnávateľa', use: 'Cestovný príkaz' },
   { path: ['config', 'utvar'], label: 'Útvar', use: 'Žiadosť o dovolenku' },
-  { section: 'Pracovný čas (deň typu 8 a SC)' },
+  { section: 'Pracovný čas' },
   { path: ['config', 'defaultTimes', 'arrival'], label: 'Príchod', type: 'time' },
   { path: ['config', 'defaultTimes', 'breakStart'], label: 'Prestávka od', type: 'time' },
   { path: ['config', 'defaultTimes', 'breakEnd'], label: 'Prestávka do', type: 'time' },
   { path: ['config', 'defaultTimes', 'departure'], label: 'Odchod', type: 'time' },
+  { path: ['config', 'scHalfDayFrom'], label: 'SC ako 4,5 h od', type: 'month', use: 'Dochádzka: skôr 8 h a čas ako deň typu 8' },
   { section: 'Služobné cesty' },
   { path: ['scConfig', 'origin'], label: 'Bydlisko / miesto odchodu', use: 'Cestovný príkaz, vyúčtovanie' },
   { path: ['scConfig', 'destination'], label: 'Miesto konania', use: 'Cestovný príkaz, vyúčtovanie' },
@@ -124,7 +125,7 @@ export function findDiscrepancies() {
     const def = getDefault(f.path);
     if (value === undefined || value === '') {
       issues.push({ text: `${f.label}: hodnota chýba.` });
-    } else if (def !== undefined && value === def && f.type !== 'time' && f.path[1] !== 'defaultKm') {
+    } else if (def !== undefined && value === def && f.type !== 'time' && f.type !== 'month' && f.path[1] !== 'defaultKm') {
       issues.push({ text: `${f.label}: hodnota je stále ukážková ("${value}").` });
     }
   });

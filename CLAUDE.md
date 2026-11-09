@@ -72,7 +72,10 @@ index.html      - HTML structure
 - `8` - Full day (8 hours)
 - `D` - Dovolenka (vacation)
 - `S` - Sviatok (holiday)
-- `SC` - Služobná cesta (business trip)
+- `SC` - Služobná cesta (business trip). In Dochádzka only: from month `config.scHalfDayFrom`
+  (default `2026-10`, editable in Nastavenia) the day counts 4.5 h, arrival from `defaultTimes`, no break,
+  departure = arrival + 4.5 h. Earlier months count 8 h with the full `defaultTimes`.
+  The travel order keeps its fixed "Normálna pracovná doba" 08:00 - 16:30, and trip times and per diem do not use this.
 - `PN` - Práceneschopnosť (sick leave)
 - `0` - Weekend/no work
 - `4.5` - Half day (4.5 hours, key `4`). Arrival from `defaultTimes`, no break, departure = arrival + 4.5 h.
