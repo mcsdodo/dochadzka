@@ -11,9 +11,6 @@ Employee attendance and business trip management application.
 
 ## Development
 
-This repo has no CHANGELOG.md, and must not get one. If a commit hook asks for a changelog
-entry, commit with `CHANGELOG_SKIP=1`.
-
 ```bash
 npx live-server
 ```
