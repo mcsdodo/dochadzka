@@ -91,6 +91,9 @@ index.html      - HTML structure
   `defaultPerDiemRates` in [js/state.js](./js/state.js) seeds files without a table; Nastavenia
   reports default rows that the file lacks or that differ. Add each new year's rates there too.
   `scConfig.perDiem` (3 numbers) in old files is obsolete; Nastavenia offers to remove it.
+- Holidays: `getSlovakHolidays(year)` holds the days of rest by year, because the law changes
+  them (8.5. and 15.9. are working days in 2026 only, 17.11. from 2025, 1.9. from 2024).
+  It decides the `S` of a new month only: a month already in the file keeps its stored `S`.
 - Business trips are auto-created when SC days are marked in calendar
 - Deleted trips will regenerate if SC days still exist in calendar
 - Edit trip dates to split consecutive SC days into multiple trips

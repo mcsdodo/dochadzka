@@ -41,11 +41,22 @@ export function calculateEaster(year) {
   return new Date(year, month, day);
 }
 
+// Days of rest (dni pracovného pokoja) under zákon 241/1993 Z. z. A state holiday
+// that is a working day is not in the set:
+// - 1.9. is a working day from 2024.
+// - 17.11. is a working day from 1.11.2025 (zákon 261/2025 Z. z., § 2 ods. 3).
+// - 8.5. and 15.9. are working days in 2026 only (§ 4b), and days of rest again from 2027.
 export function getSlovakHolidays(year) {
   if (holidayCache.has(year)) return holidayCache.get(year);
   const holidays = new Set([
-    '01-01', '01-06', '05-01', '05-08', '07-05', '08-29', '09-01', '09-15', '11-01', '11-17', '12-24', '12-25', '12-26',
+    '01-01', '01-06', '05-01', '07-05', '08-29', '11-01', '12-24', '12-25', '12-26',
   ]);
+  if (year <= 2023) holidays.add('09-01');
+  if (year <= 2024) holidays.add('11-17');
+  if (year !== 2026) {
+    holidays.add('05-08');
+    holidays.add('09-15');
+  }
   const easter = calculateEaster(year);
   const goodFriday = new Date(easter);
   goodFriday.setDate(easter.getDate() - 2);
